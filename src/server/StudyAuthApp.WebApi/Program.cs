@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using StudyAuthApp.WebApi.Data;
+using StudyAuthApp.WebApi.Interfaces;
+using StudyAuthApp.WebApi.Repositories;
+using StudyAuthApp.WebApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,11 +12,24 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+
+builder.Services.AddCors(opt =>
+{
+    opt.AddPolicy("CorsPolicy", policy =>
+    {
+        policy.AllowAnyHeader().AllowAnyMethod()
+              .AllowCredentials().WithOrigins("https://localhost:4200");
+    });
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseCors("CorsPolicy");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -23,7 +39,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
 
 app.MapControllers();
