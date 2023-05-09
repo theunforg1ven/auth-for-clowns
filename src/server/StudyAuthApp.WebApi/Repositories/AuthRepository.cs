@@ -19,20 +19,6 @@ namespace StudyAuthApp.WebApi.Repositories
             _config = config;
         }
 
-        public async Task<User> GetUserById(int id)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
-
-            if (user == null)
-                return null;
-
-            return user;
-        }
-
-
-        public async Task<bool> UserExists(string username)
-            => await _context.Users.AnyAsync(x => x.Username == username);
-
         public async Task<User> Login(string email, string password)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
@@ -46,6 +32,32 @@ namespace StudyAuthApp.WebApi.Repositories
             return user;
         }
 
+        public async Task<bool> AddUserRefreshToken(UserToken token)
+        {
+            await _context.UserTokens.AddAsync(token);
+            var savedChanges = await _context.SaveChangesAsync();
+
+            return savedChanges > 0;
+        }
+
+        public async Task<bool> DeleteUserRefreshToken(string refreshToken)
+        {
+            var userToken = await _context.UserTokens.FirstOrDefaultAsync(ut => ut.Token == refreshToken);
+            _context.UserTokens.Remove(userToken);
+            var savedChanges = await _context.SaveChangesAsync();
+
+            return savedChanges > 0;
+        }
+
+        public async Task<bool> IsRefreshTokenAvailable(int userId, string refreshToken)
+        {
+            var isAvailable = await _context.UserTokens
+                .Where(ut => ut.UserId == userId && ut.Token == refreshToken && ut.ExpiredAt > DateTime.Now)
+                .AnyAsync();
+
+            return isAvailable;
+        }
+
         public async Task<User> Register(User user, string password)
         {
             var hashedPassword = CreatePasswordHash(password);
@@ -56,6 +68,17 @@ namespace StudyAuthApp.WebApi.Repositories
             await _context.SaveChangesAsync();
 
             return user;
+        }
+
+        public async Task<bool> AddResetToken(ResetToken resetToken)
+        {
+            if (resetToken == null)
+                return false;
+
+           await _context.ResetTokens.AddAsync(resetToken);
+           var savedChanges =  await _context.SaveChangesAsync();
+
+           return savedChanges > 0;
         }
 
         private string CreatePasswordHash(string password)

@@ -8,8 +8,12 @@ namespace StudyAuthApp.WebApi.Interfaces
 
         Task<User> Login(string username, string password);
 
-        Task<User> GetUserById(int id);
+        Task<bool> AddUserRefreshToken(UserToken token);
 
-        Task<bool> UserExists(string username);
+        Task<bool> DeleteUserRefreshToken(string refreshToken);
+
+        Task<bool> IsRefreshTokenAvailable(int userId, string refreshToken);
+
+        Task<bool> AddResetToken(ResetToken resetToken);
     }
 }

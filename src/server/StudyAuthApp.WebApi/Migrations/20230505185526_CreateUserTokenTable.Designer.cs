@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StudyAuthApp.WebApi.Data;
 
@@ -11,9 +12,11 @@ using StudyAuthApp.WebApi.Data;
 namespace StudyAuthApp.WebApi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230505185526_CreateUserTokenTable")]
+    partial class CreateUserTokenTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,23 +24,6 @@ namespace StudyAuthApp.WebApi.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("StudyAuthApp.WebApi.Models.ResetToken", b =>
-                {
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Token")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Email");
-
-                    b.HasIndex("Token")
-                        .IsUnique()
-                        .HasFilter("[Token] IS NOT NULL");
-
-                    b.ToTable("ResetTokens");
-                });
 
             modelBuilder.Entity("StudyAuthApp.WebApi.Models.User", b =>
                 {

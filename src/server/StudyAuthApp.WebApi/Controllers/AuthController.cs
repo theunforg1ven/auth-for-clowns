@@ -1,6 +1,6 @@
-﻿using Azure.Core;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using StudyAuthApp.WebApi.DTOs;
 using StudyAuthApp.WebApi.Interfaces;
 using StudyAuthApp.WebApi.Models;
@@ -18,32 +18,6 @@ namespace StudyAuthApp.WebApi.Controllers
         {
             _authRepo = repo;
             _tokenService = tokenService;
-        }
-
-        [HttpGet("user")]
-        public async Task<IActionResult> GetCurrentUser()
-        {
-            var authorizationHeader = Request.Headers["Authorization"].ToString();
-
-            if (authorizationHeader == null || authorizationHeader.Length <= 8)
-                return Unauthorized("User is unauthorized!");
-
-            var accessToken = authorizationHeader[7..];
-
-            var id = _tokenService.DecodeToken(accessToken, out bool hasTokenExpired);
-
-            if(id == -1)
-                return Unauthorized("No user token found!");
-
-            if(hasTokenExpired)
-                return Unauthorized("Token is expired!");
-
-            var user = await _authRepo.GetUserById(id);
-
-            if (user == null)
-                return Unauthorized("No user found!");
-
-            return Ok(user);
         }
 
         [HttpPost("register")]
@@ -80,6 +54,11 @@ namespace StudyAuthApp.WebApi.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto loginDto)
         {
+            var authorizationHeader = Request.Headers["Authorization"];
+
+            if (!authorizationHeader.IsNullOrEmpty())
+                return RedirectToAction("GetCurrentUser", "Auth");
+
             var userFromRepo = await _authRepo.Login(loginDto.Email, loginDto.Password);
 
             if (userFromRepo == null)
@@ -94,6 +73,18 @@ namespace StudyAuthApp.WebApi.Controllers
             };
             Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
 
+            var token = new UserToken()
+            {
+                UserId = userFromRepo.Id,
+                Token = refreshToken,
+                ExpiredAt = DateTime.Now.AddDays(7)
+            };
+
+            var isTokenSaved = await _authRepo.AddUserRefreshToken(token);
+
+            if (!isTokenSaved)
+                return  Unauthorized("Error of adding token to database!");
+
             return Ok(new
             {
                 token = accessToken,
@@ -101,7 +92,7 @@ namespace StudyAuthApp.WebApi.Controllers
         }
 
         [HttpPost("refresh")]
-        public IActionResult Refresh()
+        public async Task<IActionResult> Refresh()
         {
             var refreshToken = Request.Cookies["refreshToken"]?.ToString();
 
@@ -109,6 +100,11 @@ namespace StudyAuthApp.WebApi.Controllers
                 return Unauthorized("User is unauthorized!");
 
             var id = _tokenService.DecodeToken(refreshToken, out bool hasTokenExpired);
+
+            var isRefreshTokenAvailable = await _authRepo.IsRefreshTokenAvailable(id, refreshToken);
+
+            if (!isRefreshTokenAvailable)
+                return Unauthorized("No available refresh token in database!");
 
             if (id == -1)
                 return Unauthorized("No user token found!");
@@ -125,12 +121,17 @@ namespace StudyAuthApp.WebApi.Controllers
         }
 
         [HttpPost("logout")]
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
             var refreshToken = Request.Cookies["refreshToken"]?.ToString();
 
             if (refreshToken == null)
                 return Ok("User is already logged out!");
+
+            var isRefreshTokenAvailable = await _authRepo.DeleteUserRefreshToken(refreshToken);
+
+            if (!isRefreshTokenAvailable)
+                return Unauthorized("No available refresh token in database!");
 
             Response.Cookies.Delete("refreshToken");
 
