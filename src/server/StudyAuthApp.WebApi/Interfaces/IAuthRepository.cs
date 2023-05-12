@@ -1,10 +1,11 @@
-﻿using StudyAuthApp.WebApi.Models;
+﻿using StudyAuthApp.WebApi.DTOs;
+using StudyAuthApp.WebApi.Models;
 
 namespace StudyAuthApp.WebApi.Interfaces
 {
     public interface IAuthRepository
     {
-        Task<User> Register(User user, string password);
+        Task<User> Register(User user, string password, string origin);
 
         Task<User> Login(string username, string password);
 
@@ -14,6 +15,12 @@ namespace StudyAuthApp.WebApi.Interfaces
 
         Task<bool> IsRefreshTokenAvailable(int userId, string refreshToken);
 
+        Task<ResetToken> CreateResetToken(ForgotDto forgotDto, string origin);
+
         Task<bool> AddResetToken(ResetToken resetToken);
+
+        Task<User> ValidateResetToken(ValidateResetTokenDto resetTokenDto);
+
+        Task<bool> ResetPassword(ResetDto resetDto);
     }
 }

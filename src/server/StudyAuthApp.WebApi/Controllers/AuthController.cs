@@ -38,7 +38,10 @@ namespace StudyAuthApp.WebApi.Controllers
                 Password = registerDTo.Password,
             };
 
-            var createdUser = await _authRepo.Register(user, user.Password);
+            var createdUser = await _authRepo.Register(user, user.Password, Request.Headers["origin"]);
+
+            if(createdUser == null)
+                return Unauthorized("Error of creating new user!");
 
             var registeredUser = new RegisteredUserDto()
             {

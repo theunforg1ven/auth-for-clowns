@@ -8,5 +8,7 @@ namespace StudyAuthApp.WebApi.Models
         public string Email { get; set; }
 
         public string Token { get; set; }
+
+        public DateTime ResetTokenExpires { get; set; } = DateTime.UtcNow.AddHours(1);
     }
 }
