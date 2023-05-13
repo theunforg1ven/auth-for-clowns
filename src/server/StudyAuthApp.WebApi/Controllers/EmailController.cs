@@ -66,5 +66,59 @@ namespace StudyAuthApp.WebApi.Controllers
                 message = "Password reset successful, you can now login!"
             });
         }
+
+        [HttpPost("confirm-email")]
+        public async Task<IActionResult> ConfirmEmail(ConfirmEmailDto emailDto)
+        {
+            if (emailDto.Email == null)
+                return Unauthorized("No email to confirm!");
+
+            var isTokenSaved = await _authRepo.ConfirmEmail(emailDto, Request.Headers["origin"]);
+
+            if (!isTokenSaved)
+                return NotFound("No token for verification!");
+
+            return Ok(new
+            {
+                message = "Confirmation email sent, check your email!"
+            });
+        }
+
+        [HttpPost("verify-email")]
+        public async Task<IActionResult> VerifyEmail(VerifyEmailDto emailDto)
+        {
+            if (emailDto.Token == null)
+                return Unauthorized("No token to verify email!");
+
+            var isEmailVerified = await _authRepo.VerifyEmail(emailDto);
+
+            if (!isEmailVerified)
+                return NotFound("Email wasn't verified!"); ;
+
+            return Ok(new
+            {
+                message = "Verification successful, your email was verified!"
+            });
+        }
+
+        [HttpPost("change-email")]
+        public async Task<IActionResult> ChangeEmail(ChangeEmailDto emailDto)
+        {
+            if (emailDto.NewEmail == emailDto.CurrentEmail)
+                return Unauthorized("New email is the same as an old one!");
+
+            if (emailDto.Password != emailDto.ConfirmPassword)
+                return Unauthorized("Passwords do not match!");
+
+            var isEmailChanged = await _authRepo.ChangeEmail(emailDto, Request.Headers["origin"]);
+
+            if (!isEmailChanged)
+                return NotFound("Email wasn't changed!"); ;
+
+            return Ok(new
+            {
+                message = "Email change successful, verify your new email!"
+            });
+        }
     }
 }

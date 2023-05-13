@@ -23,6 +23,26 @@ namespace StudyAuthApp.WebApi.Repositories
             _emailService = emailService;
         }
 
+        #region Register & Login
+
+        public async Task<User> Register(User user, string password, string origin)
+        {
+            if (await _context.Users.AnyAsync(x => x.Email == user.Email))
+            {
+                await SendAlreadyRegisteredEmail(user.Email, origin);
+                return null;
+            }
+
+            var hashedPassword = CreatePasswordHash(password);
+
+            user.Password = hashedPassword;
+
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
+
+            return user;
+        }
+
         public async Task<User> Login(string email, string password)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
@@ -35,6 +55,10 @@ namespace StudyAuthApp.WebApi.Repositories
 
             return user;
         }
+
+        #endregion
+
+        #region Refresh tokens
 
         public async Task<bool> AddUserRefreshToken(UserToken token)
         {
@@ -64,23 +88,9 @@ namespace StudyAuthApp.WebApi.Repositories
             return isAvailable;
         }
 
-        public async Task<User> Register(User user, string password, string origin)
-        {
-            if (await _context.Users.AnyAsync(x => x.Email == user.Email))
-            {
-                await SendAlreadyRegisteredEmail(user.Email, origin);
-                return null;
-            }
+        #endregion
 
-            var hashedPassword = CreatePasswordHash(password);
-
-            user.Password = hashedPassword;
-
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
-
-            return user;
-        }
+        #region Forgot & Reset password
 
         public async Task<bool> AddResetToken(ResetToken resetToken)
         {
@@ -105,7 +115,7 @@ namespace StudyAuthApp.WebApi.Repositories
             {
                 Email = forgotDto.Email,
                 Token = GenerateResetToken(),
-                ResetTokenExpires = DateTime.UtcNow.AddDays(1),
+                ResetTokenExpires = DateTime.UtcNow.AddMinutes(30),
             };
 
             // Send email with created Reset Token
@@ -144,6 +154,75 @@ namespace StudyAuthApp.WebApi.Repositories
             return savedChanges > 0;
         }
 
+        #endregion
+
+        #region Verify & Change email
+
+        public async Task<bool> ConfirmEmail(ConfirmEmailDto emailDto, string origin)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == emailDto.Email)
+                ?? throw new AppException("No user found to confirm email!");
+
+            if (user.IsEmailVerified)
+                return false;
+
+            user.EmailVerificationToken = GenerateVerificationToken();
+            user.EmailTokenExpiresAt = DateTime.UtcNow.AddMinutes(30);
+
+            _context.Users.Update(user);
+            var savedChanges = await _context.SaveChangesAsync();
+
+            await SendVerificationEmail(user, origin);
+
+            return savedChanges > 0;
+        }
+
+        public async Task<bool> VerifyEmail(VerifyEmailDto emailDto)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.EmailVerificationToken == emailDto.Token)
+                ?? throw new AppException("No user for verification!");
+
+            if (user.IsEmailVerified || user.EmailTokenExpiresAt < DateTime.UtcNow)
+                return false;
+
+            user.EmailVerifiedAt = DateTime.UtcNow;
+            user.IsEmailVerified = true;
+            user.EmailTokenExpiresAt = default;
+            user.EmailVerificationToken = null;
+
+            _context.Users.Update(user);
+            var savedChanges = await _context.SaveChangesAsync();          
+
+            return savedChanges > 0;
+        }
+
+        public async Task<bool> ChangeEmail(ChangeEmailDto emailDto, string origin)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == emailDto.CurrentEmail)
+                ?? throw new AppException("No user for verification!");
+
+            if (!VerifyPasswordHash(emailDto.Password, user.Password))
+                return false;
+
+            user.Email = emailDto.NewEmail;
+            user.EmailVerifiedAt = default;
+            user.IsEmailVerified = false;
+            user.EmailVerificationToken = GenerateVerificationToken();
+            user.EmailTokenExpiresAt = DateTime.UtcNow.AddMinutes(30);
+
+            _context.Users.Update(user);
+
+            await SendVerificationEmail(user, origin);
+
+            var savedChanges = await _context.SaveChangesAsync();
+
+            return savedChanges > 0;
+        }
+
+        #endregion
+
+        #region Generate tokens private helpers
+
         private string GenerateResetToken()
         {
             var token = Convert.ToHexString(RandomNumberGenerator.GetBytes(64));
@@ -155,32 +234,43 @@ namespace StudyAuthApp.WebApi.Repositories
             return token;
         }
 
-        //private async Task SendVerificationEmail(User user, string origin)
-        //{
-        //    string message;
-        //    if (!string.IsNullOrEmpty(origin))
-        //    {
-        //        // origin exists if request sent from browser single page app (e.g. Angular or React)
-        //        // so send link to verify via single page app
-        //        var verifyUrl = $"{origin}/api/email/verify-email?token={user.VerificationToken}";
-        //        message = $@"<p>Please click the below link to verify your email address:</p>
-        //                    <p><a href=""{verifyUrl}"">{verifyUrl}</a></p>";
-        //    }
-        //    else
-        //    {
-        //        // origin missing if request sent directly to api (e.g. from Postman)
-        //        // so send instructions to verify directly with api
-        //        message = $@"<p>Please use the below token to verify your email address</p>
-        //                    <p><code>{user.VerificationToken}</code></p>";
-        //    }
+        private string GenerateVerificationToken()
+        {
+            var token = Convert.ToHexString(RandomNumberGenerator.GetBytes(64));
 
-        //    await _emailService.Send(
-        //        to: user.Email,
-        //        subject: "Sign-up Verification API - Verify Email",
-        //        html: $@"<h4>Verify Email</h4>
-        //                {message}"
-        //    );
-        //}
+            var tokenIsUnique = !_context.Users.Any(u => u.EmailVerificationToken == token);
+            if (!tokenIsUnique)
+                return GenerateVerificationToken();
+
+            return token;
+        }
+
+        #endregion
+
+        #region Send emails private helpers
+
+        private async Task SendVerificationEmail(User user, string origin)
+        {
+            string message;
+            if (!string.IsNullOrEmpty(origin))
+            {
+                var verifyUrl = $"{origin}/api/email/verify-email?token={user.EmailVerificationToken}";
+                message = $@"<p>Please click the below link to verify your email address:</p>
+                            <p><a href=""{verifyUrl}"">verify your email</a></p>";
+            }
+            else
+            {
+                message = $@"<p>Please use the below token to verify your email address</p>
+                            <p><code>{user.EmailVerificationToken}</code></p>";
+            }
+
+            await _emailService.Send(
+                to: user.Email,
+                subject: "Email verification",
+                html: $@"<h4>Verify Email</h4>
+                        {message}"
+            );
+        }
 
         private async Task SendPasswordResetEmail(ResetToken resetToken, string origin)
         {
@@ -188,8 +278,8 @@ namespace StudyAuthApp.WebApi.Repositories
             if (!string.IsNullOrEmpty(origin))
             {
                 var resetUrl = $"{origin}/api/email/reset-password?token={resetToken.Token}";
-                message = $@"<p>Please click the below link to reset your password, the link will be valid for 1 day:</p>
-                            <p><a href=""{resetUrl}"">{resetUrl}</a></p>";
+                message = $@"<p>Please click the below link to reset your password! Link is available for 30 minutes</p>
+                            <p><a href=""{resetUrl}"">reset password</a></p>";
             }
             else
             {
@@ -199,7 +289,7 @@ namespace StudyAuthApp.WebApi.Repositories
 
             await _emailService.Send(
                 to: resetToken.Email,
-                subject: "Sign-up Verification API - Reset Password",
+                subject: "Password Reset",
                 html: $@"<h4>Reset Password Email</h4>
                         {message}"
             );
@@ -215,12 +305,16 @@ namespace StudyAuthApp.WebApi.Repositories
 
             await _emailService.Send(
                 to: email,
-                subject: "Sign-up Verification API - Email Already Registered",
+                subject: "Register Verification - Your email is already registered!",
                 html: $@"<h4>Email Already Registered</h4>
-                        <p>Your email <strong>{email}</strong> is already registered.</p>
+                        <p>Your email <strong>{email}</strong> is already in use.</p>
                         {message}"
             );
         }
+
+        #endregion
+
+        #region Hash passwords private helpers
 
         private string CreatePasswordHash(string password)
         {
@@ -253,5 +347,7 @@ namespace StudyAuthApp.WebApi.Repositories
 
             return isVerifiedPassword;
         }
+
+        #endregion
     }
 }

@@ -22,5 +22,11 @@ namespace StudyAuthApp.WebApi.Interfaces
         Task<User> ValidateResetToken(ValidateResetTokenDto resetTokenDto);
 
         Task<bool> ResetPassword(ResetDto resetDto);
+
+        Task<bool> ConfirmEmail(ConfirmEmailDto emailDto, string origin);
+
+        Task<bool> VerifyEmail(VerifyEmailDto emailDto);
+
+        Task<bool> ChangeEmail(ChangeEmailDto emailDto, string origin);
     }
 }

@@ -13,5 +13,13 @@
         public string Email { get; set; }
 
         public string Password { get; set; }
+
+        public bool IsEmailVerified { get; set; }
+
+        public DateTime EmailVerifiedAt { get; set; }
+
+        public DateTime EmailTokenExpiresAt { get; set; }
+
+        public string EmailVerificationToken { get; set; }
     }
 }
