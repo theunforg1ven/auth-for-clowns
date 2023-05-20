@@ -36,6 +36,7 @@ namespace StudyAuthApp.WebApi.Repositories
             var hashedPassword = CreatePasswordHash(password);
 
             user.Password = hashedPassword;
+            user.Role = Role.User;
 
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
@@ -62,6 +63,14 @@ namespace StudyAuthApp.WebApi.Repositories
 
         public async Task<bool> AddUserRefreshToken(UserToken token)
         {
+            if (await _context.UserTokens.Where(ut => ut.UserId == token.UserId).AnyAsync())
+            {
+                var tokensToRemove = await _context.UserTokens
+                    .Where(ut => ut.UserId == token.UserId)
+                    .ToListAsync();
+                _context.UserTokens.RemoveRange(tokensToRemove);
+            }
+
             await _context.UserTokens.AddAsync(token);
             var savedChanges = await _context.SaveChangesAsync();
 

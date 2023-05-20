@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using StudyAuthApp.WebApi.AuthorizeHelpers;
 using StudyAuthApp.WebApi.Data;
 using StudyAuthApp.WebApi.Helpers;
 using StudyAuthApp.WebApi.Interfaces;
@@ -14,6 +16,11 @@ builder.Services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+
+builder.Services.AddAuthentication((options) =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+});
 
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
@@ -46,6 +53,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<ErrorHandlerMiddleware>();
+app.UseMiddleware<AuthorizeMiddleware>();
 
 app.MapControllers();
 

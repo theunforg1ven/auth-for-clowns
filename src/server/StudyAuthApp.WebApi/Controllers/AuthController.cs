@@ -1,25 +1,29 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using StudyAuthApp.WebApi.AuthorizeHelpers;
 using StudyAuthApp.WebApi.DTOs;
 using StudyAuthApp.WebApi.Interfaces;
 using StudyAuthApp.WebApi.Models;
 
 namespace StudyAuthApp.WebApi.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthRepository _authRepo;
         private readonly ITokenService _tokenService;
+        private readonly IUserRepository _userRepository;
 
-        public AuthController(IAuthRepository repo, ITokenService tokenService)
+        public AuthController(IAuthRepository repo, ITokenService tokenService, IUserRepository userRepository)
         {
             _authRepo = repo;
             _tokenService = tokenService;
+            _userRepository = userRepository;
         }
 
+        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto registerDTo)
         {
@@ -54,6 +58,7 @@ namespace StudyAuthApp.WebApi.Controllers
             return Ok(registeredUser);
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto loginDto)
         {
@@ -88,12 +93,15 @@ namespace StudyAuthApp.WebApi.Controllers
             if (!isTokenSaved)
                 return  Unauthorized("Error of adding token to database!");
 
+            HttpContext.Items["User"] = userFromRepo;
+
             return Ok(new
             {
                 token = accessToken,
             });
         }
 
+        [AllowAnonymous]
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh()
         {
@@ -123,6 +131,7 @@ namespace StudyAuthApp.WebApi.Controllers
             });
         }
 
+        [AllowAnonymous]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
