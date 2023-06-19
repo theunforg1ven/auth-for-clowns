@@ -1,208 +1,242 @@
 <div class="outer">
   <div class="container">
-    <div class="row">
-      <div class="offset-md-2 col-lg-5 col-md-7 offset-lg-4 offset-md-3">
-        <div class="panel border bg-white">
-          <div class="panel-heading">
-            <h3 class="pt-3 font-weight-bold">Register</h3>
+    <div
+      class="offset-md-2 col-lg-5 col-md-7 offset-lg-4 offset-md-3 main-block"
+    >
+      <div class="panel-heading">
+        <h3 class="pt-3 font-weight-bold">Register</h3>
+      </div>
+      <div class="panel-body p-2">
+        <!--------------- Start of form group ------------------------>
+        <form [formGroup]="registerForm">
+          <div class="form-group pt-3">
+            <div
+              class="input-field"
+              [class.error]="
+                registerForm.controls['firstName'].dirty &&
+                registerForm.hasError('required', 'firstName')
+              "
+            >
+              <input
+                formControlName="firstName"
+                type="text"
+                placeholder="First Name"
+                nbInput
+                fullWidth
+              />
+            </div>
           </div>
-          <div class="panel-body p-3">
-            <!--------------- Start of form group ------------------------>
-            <form [formGroup]="registerForm">
-              <div class="form-group pt-3">
-                <div
-                  class="input-field"
-                  [class.error]="
-                    registerForm.controls['firstName'].dirty &&
-                    registerForm.hasError('required', 'firstName')
-                  "
-                >
-                  <input
-                    formControlName="firstName"
-                    type="text"
-                    placeholder="First Name"
-                  />
-                </div>
-              </div>
-              <small
-                *ngIf="
-                  registerForm.controls['firstName'].dirty &&
-                  registerForm.hasError('required', 'firstName')
-                "
-                class="text-danger"
-                >*First name is required</small
-              >
-              <div class="form-group pt-3">
-                <div
-                  class="input-field"
-                  [class.error]="
-                    registerForm.controls['lastName'].dirty &&
-                    registerForm.hasError('required', 'lastName')
-                  "
-                >
-                  <input
-                    formControlName="lastName"
-                    type="text"
-                    placeholder="Last Name"
-                  />
-                </div>
-              </div>
-              <small
-                *ngIf="
-                  registerForm.controls['lastName'].dirty &&
-                  registerForm.hasError('required', 'lastName')
-                "
-                class="text-danger"
-                >*Last name is required</small
-              >
-              <div class="form-group pt-3">
-                <div
-                  class="input-field"
-                  [class.error]="
-                    registerForm.controls['username'].dirty &&
-                    registerForm.hasError('required', 'username')
-                  "
-                >
-                  <input
-                    formControlName="username"
-                    type="text"
-                    placeholder="Username"
-                  />
-                </div>
-              </div>
-              <small
-                *ngIf="
-                  registerForm.controls['username'].dirty &&
-                  registerForm.hasError('required', 'username')
-                "
-                class="text-danger"
-                >*Username is required</small
-              >
-              <div class="form-group pt-3">
-                <div
-                  class="input-field"
-                  [class.error]="
-                    registerForm.controls['email'].dirty &&
-                    registerForm.hasError('required', 'email')
-                  "
-                >
-                  <input
-                    formControlName="email"
-                    type="text"
-                    placeholder="Email"
-                  />
-                </div>
-              </div>
-              <small
-                *ngIf="
-                  registerForm.controls['email'].dirty &&
-                  registerForm.hasError('required', 'email')
-                "
-                class="text-danger"
-                >*Email is required</small
-              >
-              <div class="form-group pt-3">
-                <div
-                  class="input-field"
-                  [class.error]="
-                    registerForm.controls['confirmEmail'].dirty &&
-                    registerForm.hasError('required', 'confirmEmail')
-                  "
-                >
-                  <input
-                    formControlName="confirmEmail"
-                    type="text"
-                    placeholder="Confirm Email"
-                  />
-                </div>
-              </div>
-              <small
-                *ngIf="
-                  registerForm.controls['confirmEmail'].dirty &&
-                  registerForm.hasError('required', 'confirmEmail')
-                "
-                class="text-danger"
-                >*You have to confirm your email</small
-              >
-              <div class="form-group pt-3">
-                <div
-                  class="input-field"
-                  [class.error]="
-                    registerForm.controls['password'].dirty &&
-                    registerForm.hasError('required', 'password')
-                  "
-                >
-                  <input
-                    formControlName="password"
-                    type="password"
-                    placeholder="Password"
-                  />
-                </div>
-              </div>
-              <small
-                *ngIf="
-                  registerForm.controls['password'].dirty &&
-                  registerForm.hasError('required', 'password')
-                "
-                class="text-danger"
-                >*Password is required</small
-              >
-              <div class="form-group pt-3">
-                <div
-                  class="input-field"
-                  [class.error]="
-                    registerForm.controls['confirmPassword'].dirty &&
-                    registerForm.hasError('required', 'confirmPassword')
-                  "
-                >
-                  <input
-                    formControlName="confirmPassword"
-                    type="password"
-                    placeholder="Confirm Password"
-                  />
-                </div>
-              </div>
-              <small
-                *ngIf="
-                  registerForm.controls['confirmPassword'].dirty &&
-                  registerForm.hasError('required', 'confirmPassword')
-                "
-                class="text-danger"
-                >*You have to confirm your password</small
-              >
-              <small
-                *ngIf="registerForm.hasError('notMatching', 'confirmPassword')"
-                class="text-danger"
-              ></small>
-              <button
-                [disabled]="registerForm.invalid"
-                (click)="onRegister()"
-                type="submit"
-                class="btn btn-success btn-block mt-4 w-100"
-              >
-                Register
-              </button>
-              <!-- <div class="form-group pt-3">
-                <form [formGroup]="aFormGroup">
-                  <ngx-recaptcha2
-                    #captchaElem
-                    [useGlobalDomain]="false"
-                    formControlName="recaptcha"
-                  >
-                  </ngx-recaptcha2>
-                </form>
-              </div> -->
+          <small
+            *ngIf="
+              registerForm.controls['firstName'].dirty &&
+              registerForm.hasError('required', 'firstName')
+            "
+            class="text-danger"
+            >*First name is required</small
+          >
+          <div class="form-group pt-3">
+            <div
+              class="input-field"
+              [class.error]="
+                registerForm.controls['lastName'].dirty &&
+                registerForm.hasError('required', 'lastName')
+              "
+            >
+              <input
+                formControlName="lastName"
+                type="text"
+                placeholder="Last Name"
+                nbInput
+                fullWidth
+              />
+            </div>
+          </div>
+          <small
+            *ngIf="
+              registerForm.controls['lastName'].dirty &&
+              registerForm.hasError('required', 'lastName')
+            "
+            class="text-danger"
+            >*Last name is required</small
+          >
+          <div class="form-group pt-3">
+            <div
+              class="input-field"
+              [class.error]="
+                registerForm.controls['username'].dirty &&
+                registerForm.hasError('required', 'username')
+              "
+            >
+              <input
+                formControlName="username"
+                type="text"
+                placeholder="Username"
+                nbInput
+                fullWidth
+              />
+            </div>
+          </div>
+          <small
+            *ngIf="
+              registerForm.controls['username'].dirty &&
+              registerForm.hasError('required', 'username')
+            "
+            class="text-danger"
+            >*Username is required</small
+          >
+          <div class="form-group pt-3">
+            <div
+              class="input-field"
+              [class.error]="
+                registerForm.controls['email'].dirty &&
+                registerForm.hasError('required', 'email')
+              "
+            >
+              <input
+                formControlName="email"
+                type="text"
+                placeholder="Email"
+                nbInput
+                fullWidth
+              />
+            </div>
+          </div>
+          <small
+            *ngIf="
+              registerForm.controls['email'].dirty &&
+              registerForm.hasError('required', 'email')
+            "
+            class="text-danger"
+            >*Email is required</small
+          >
+          <div class="form-group pt-3">
+            <div
+              class="input-field"
+              [class.error]="
+                registerForm.controls['confirmEmail'].dirty &&
+                registerForm.hasError('required', 'confirmEmail')
+              "
+            >
+              <input
+                formControlName="confirmEmail"
+                type="text"
+                placeholder="Confirm Email"
+                nbInput
+                fullWidth
+              />
+            </div>
+          </div>
+          <small
+            *ngIf="
+              registerForm.controls['confirmEmail'].dirty &&
+              registerForm.hasError('required', 'confirmEmail')
+            "
+            class="text-danger"
+            >*You have to confirm your email</small
+          >
+          <div class="form-group pt-3">
+            <div
+              class="input-field"
+              [class.error]="
+                registerForm.controls['password'].dirty &&
+                registerForm.hasError('required', 'password')
+              "
+            >
+              <input
+                formControlName="password"
+                type="password"
+                placeholder="Password"
+                nbInput
+                fullWidth
+              />
+            </div>
+          </div>
+          <small
+            *ngIf="
+              registerForm.controls['password'].dirty &&
+              registerForm.hasError('required', 'password')
+            "
+            class="text-danger"
+            >*Password is required</small
+          >
+          <div class="form-group pt-3">
+            <div
+              class="input-field"
+              [class.error]="
+                registerForm.controls['confirmPassword'].dirty &&
+                registerForm.hasError('required', 'confirmPassword')
+              "
+            >
+              <input
+                formControlName="confirmPassword"
+                type="password"
+                placeholder="Confirm Password"
+                nbInput
+                fullWidth
+              />
+            </div>
+          </div>
+          <small
+            *ngIf="
+              registerForm.controls['confirmPassword'].dirty &&
+              registerForm.hasError('required', 'confirmPassword')
+            "
+            class="text-danger"
+            >*You have to confirm your password</small
+          >
+          <small
+            *ngIf="registerForm.hasError('notMatching', 'confirmPassword')"
+            class="text-danger"
+          ></small>
+          <button
+            [disabled]="registerForm.invalid"
+            (click)="onRegister()"
+            type="submit"
+            class="mt-3"
+            nbButton
+            fullWidth
+            status="primary"
+            size="large"
+          >
+            Register
+          </button>
 
-              <div class="text-center pt-4 text-muted">
-                Already have an account?
-                <a id="forgot" class="btn btn-info btn-sm" routerLink="/login"
-                  >Log in</a
-                >
-              </div>
-            </form>
-            <!--------------- End of form group ------------------------>
+          <div class="text-center pt-3">
+            Already have an account?
+            <a
+              nbButton
+              status="info"
+              size="small"
+              id="forgot"
+              class="btn btn-info btn-sm"
+              routerLink="/login"
+              >Log in</a
+            >
           </div>
-        </div>
+        </form>
+        <!--------------- End of form group ------------------------>
+        <section>
+          <div class="text-center pt-2">or enter with:</div>
+          <div class="mx-3 my-2 py-2 bordert">
+            <div class="text-center">
+              <a href="https://www.google.com" target="_blank" class="px-2">
+                <nb-icon icon="google" status="basic"></nb-icon>
+              </a>
+              <a href="https://www.microsoft.com" target="_blank" class="px-2">
+                <nb-icon icon="linkedin" status="basic"></nb-icon>
+              </a>
+              <a href="https://wwww.facebook.com" target="_blank" class="px-2">
+                <nb-icon icon="facebook" status="basic"></nb-icon>
+              </a>
+              <a href="https://www.github.com" target="_blank" class="px-2">
+                <nb-icon icon="twitter" status="basic"></nb-icon>
+              </a>
+              <a href="https://www.github.com" target="_blank" class="px-2">
+                <nb-icon icon="github" status="basic"></nb-icon>
+              </a>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   </div>

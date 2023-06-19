@@ -1,10 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import FormValidator from 'src/app/helpers/formValidator';
 
 @Component({
@@ -33,6 +28,8 @@ export class LoginComponent implements OnInit {
       this.formValidator.validateFormFields(this.loginForm);
     }
   }
+
+
 
 
 }
