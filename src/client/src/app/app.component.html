@@ -1,6 +1,23 @@
 <nb-layout>
   <nb-layout-header fixed>
-    <!-- Insert header here -->
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-4">
+          <a routerLink="/" class="logo">
+            <h2>Auth example</h2>
+          </a>
+        </div>
+        <div class="col-4"></div>
+        <div class="col-4">
+          <div class="buttons">
+            <button nbButton status="primary" routerLink="/login">Login</button>
+            <button nbButton status="success" routerLink="/register">
+              Register
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </nb-layout-header>
 
   <nb-layout-column>
