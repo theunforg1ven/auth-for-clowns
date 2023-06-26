@@ -1,30 +1,42 @@
 <nb-layout>
-  <nb-layout-header fixed>
+  <nb-layout-header fixed *ngIf="account">
     <div class="container-fluid">
       <div class="row">
         <div class="col-4">
-          <a routerLink="/" class="logo">
+          <a
+            routerLink="/"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="logo"
+          >
             <h2>Auth example</h2>
           </a>
         </div>
-        <div class="col-4"></div>
         <div class="col-4">
-          <div class="buttons">
-            <button nbButton status="primary" routerLink="/login">Login</button>
-            <button nbButton status="success" routerLink="/register">
-              Register
-            </button>
-          </div>
+          <a routerLink="/profile" routerLinkActive="active">Profile</a>
+        </div>
+        <div class="col-4">
+          <a
+            *ngIf="account.role === Role.Admin"
+            routerLink="/admin"
+            routerLinkActive="active"
+            >Admin</a
+          >
+        </div>
+        <div class="col-4">
+          <button (click)="logout()" nbButton status="primary">Logout</button>
         </div>
       </div>
     </div>
   </nb-layout-header>
 
+  <nb-layout-column *ngIf="account">
+    <router-outlet name="subnav"></router-outlet>
+  </nb-layout-column>
+
+  <alert></alert>
+
   <nb-layout-column>
     <router-outlet></router-outlet>
   </nb-layout-column>
-
-  <nb-layout-footer fixed>
-    <!-- Insert footer here -->
-  </nb-layout-footer>
 </nb-layout>

@@ -1,4 +1,7 @@
 import { Component } from '@angular/core';
+import { Role } from './_models/role';
+import { Account } from './_models/account';
+import { AuthService } from './_services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +9,14 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'client';
+  Role = Role;
+  account?: Account | null;
+
+  constructor(private authService: AuthService) {
+      this.authService.account.subscribe(a => this.account = a);
+  }
+
+  logout() {
+      this.authService.logout();
+  }
 }

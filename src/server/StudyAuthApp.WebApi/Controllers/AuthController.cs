@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using StudyAuthApp.WebApi.AuthorizeHelpers;
 using StudyAuthApp.WebApi.DTOs;
+using StudyAuthApp.WebApi.Helpers;
 using StudyAuthApp.WebApi.Interfaces;
 using StudyAuthApp.WebApi.Models;
 
