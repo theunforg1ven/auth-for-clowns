@@ -6,17 +6,28 @@ import { ProfileRoutingModule } from './profile-routing.module';
 import { LayoutComponent } from './layout.component';
 import { DetailsComponent } from './details.component';
 import { UpdateComponent } from './update.component';
+import {
+  NbButtonModule,
+  NbIconModule,
+  NbInputModule,
+  NbLayoutModule,
+  NbThemeModule,
+  NbUserModule,
+} from '@nebular/theme';
+import { NbEvaIconsModule } from '@nebular/eva-icons';
 
 @NgModule({
-    imports: [
-        CommonModule,
-        ReactiveFormsModule,
-        ProfileRoutingModule
-    ],
-    declarations: [
-        LayoutComponent,
-        DetailsComponent,
-        UpdateComponent
-    ]
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    ProfileRoutingModule,
+    NbLayoutModule,
+    NbIconModule,
+    NbEvaIconsModule,
+    NbInputModule,
+    NbButtonModule,
+    NbUserModule,
+  ],
+  declarations: [LayoutComponent, DetailsComponent, UpdateComponent],
 })
-export class ProfileModule { }
+export class ProfileModule {}

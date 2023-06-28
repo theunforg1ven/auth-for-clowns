@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import FormValidator from 'src/app/helpers/formValidator';
+import { ActivatedRoute, Router } from '@angular/router';
+import { first } from 'rxjs';
+import { AuthService } from 'src/app/_services/auth.service';
+import FormValidator from 'src/app/_helpers/formValidator';
 
 @Component({
   selector: 'app-login',
@@ -10,26 +13,45 @@ import FormValidator from 'src/app/helpers/formValidator';
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
   formValidator!: FormValidator;
+  submitting = false;
+  submitted = false;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private router: Router,
+    private authService: AuthService
+  ) {}
+
+  get f() {
+    return this.loginForm.controls;
+  }
 
   ngOnInit(): void {
     this.loginForm = this.fb.group({
-      username: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
     });
   }
 
   onSubmit() {
-    if (this.loginForm.valid) {
-      console.log(this.loginForm.value);
-    } else {
-      console.error('Form is not valid');
-      this.formValidator.validateFormFields(this.loginForm);
-    }
+    this.submitted = true;
+
+    if (this.loginForm.invalid) return;
+
+    this.submitting = true;
+    this.authService
+      .login(this.f['email'].value, this.f['password'].value)
+      .pipe(first())
+      .subscribe({
+        next: () => {
+          const returnUrl = '/home';
+          this.router.navigateByUrl(returnUrl);
+        },
+        error: (error) => {
+          console.error(error);
+          this.submitting = false;
+        },
+      });
   }
-
-
-
-
 }

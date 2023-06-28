@@ -1,7 +1,23 @@
 ﻿<h1>My Profile</h1>
-<p *ngIf="account">
-  <strong>Name: </strong> {{ account.username }} {{ account.firstName }}
-  {{ account.lastName }}<br />
-  <strong>Email: </strong> {{ account.email }}
+
+<div *ngIf="account">
+  <p><strong>Id (test only): </strong> {{ account.id }}</p>
+  <p><strong>Username: </strong> {{ account.username }}</p>
+  <p><strong>First name: </strong> {{ account.firstName }}</p>
+  <p><strong>Last name: </strong>{{ account.lastName }}</p>
+  <p><strong>Email: </strong> {{ account.email }}</p>
+  <p><strong>Role: </strong> {{ account.role }}</p>
+</div>
+
+<p>
+  <a nbButton status="primary" routerLink="update"
+    ><nb-icon icon="person-outline" status="basic"></nb-icon> Update Profile</a
+  >
 </p>
-<p><a routerLink="update">Update Profile</a></p>
+
+<p>
+  <a nbButton status="info" routerLink="update"
+    ><nb-icon icon="shield-outline" status="basic"></nb-icon> Change Security
+    Options</a
+  >
+</p>

@@ -6,17 +6,17 @@ import { AuthService } from './_services/auth.service';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
   Role = Role;
   account?: Account | null;
 
   constructor(private authService: AuthService) {
-      this.authService.account.subscribe(a => this.account = a);
+    this.authService.account.subscribe((a) => (this.account = a));
   }
 
   logout() {
-      this.authService.logout();
+    this.authService.logout();
   }
 }

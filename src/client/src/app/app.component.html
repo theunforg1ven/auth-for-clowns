@@ -2,7 +2,7 @@
   <nb-layout-header fixed *ngIf="account">
     <div class="container-fluid">
       <div class="row">
-        <div class="col-4">
+        <div class="col-3 mt-1">
           <a
             routerLink="/"
             routerLinkActive="active"
@@ -12,10 +12,12 @@
             <h2>Auth example</h2>
           </a>
         </div>
-        <div class="col-4">
+        <div class="col-3">
+          <p></p>
           <a routerLink="/profile" routerLinkActive="active">Profile</a>
         </div>
-        <div class="col-4">
+        <div class="col-3">
+          <p></p>
           <a
             *ngIf="account.role === Role.Admin"
             routerLink="/admin"
@@ -23,18 +25,18 @@
             >Admin</a
           >
         </div>
-        <div class="col-4">
-          <button (click)="logout()" nbButton status="primary">Logout</button>
+        <div class="col-3 mt-1">
+          <div class="mt-1">
+            <button (click)="logout()" nbButton status="primary">Logout</button>
+          </div>
         </div>
       </div>
     </div>
   </nb-layout-header>
 
-  <nb-layout-column *ngIf="account">
+  <div *ngIf="account">
     <router-outlet name="subnav"></router-outlet>
-  </nb-layout-column>
-
-  <alert></alert>
+  </div>
 
   <nb-layout-column>
     <router-outlet></router-outlet>

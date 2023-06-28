@@ -1,0 +1,55 @@
+﻿<h1>Accounts</h1>
+<p>All accounts from secure (admin only) api end point:</p>
+<a routerLink="add" nbButton status="success"
+  ><nb-icon icon="person-add-outline" status="basic"></nb-icon> Create
+  Account</a
+>
+<table class="table table-striped mt-4">
+  <thead>
+    <tr>
+      <th style="width: 30%; color: aliceblue">Name</th>
+      <th style="width: 30%; color: aliceblue">Email</th>
+      <th style="width: 10%; color: aliceblue">Role</th>
+      <th style="width: 30%; color: aliceblue"></th>
+    </tr>
+  </thead>
+  <tbody style="width: 10%; color: aliceblue">
+    <tr *ngFor="let account of accounts" style="color: aliceblue">
+      <td class="align-middle" style="width: 10%; color: aliceblue">
+        {{ account.title }} {{ account.firstName }} {{ account.lastName }}
+      </td>
+      <td class="align-middle" style="width: 10%; color: aliceblue">
+        {{ account.email }}
+      </td>
+      <td class="align-middle" style="width: 10%; color: aliceblue">
+        {{ account.role }}
+      </td>
+      <td style="white-space: nowrap" style="width: 10%; color: aliceblue">
+        <a routerLink="edit/{{ account.id }}" nbButton status="info" class="m-2"
+          ><nb-icon icon="edit-outline" status="basic"></nb-icon> Edit</a
+        >
+        <button
+          (click)="deleteAccount(account.id)"
+          nbButton
+          class="m-2"
+          status="danger"
+          [disabled]="account.isDeleting"
+        >
+          <span
+            *ngIf="account.isDeleting"
+            class="spinner-border spinner-border-sm"
+          ></span>
+          <span *ngIf="!account.isDeleting"
+            ><nb-icon icon="trash-2-outline" status="basic"></nb-icon>
+            Delete</span
+          >
+        </button>
+      </td>
+    </tr>
+    <tr *ngIf="!accounts">
+      <td colspan="4" class="text-center">
+        <span class="spinner-border spinner-border-lg align-center"></span>
+      </td>
+    </tr>
+  </tbody>
+</table>

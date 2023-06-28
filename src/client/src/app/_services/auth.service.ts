@@ -23,6 +23,7 @@ export class AuthService {
   }
 
   public get accountValue() {
+    //console.log('test value:', this.accountSubject.value);
     return this.accountSubject.value;
   }
 
@@ -42,6 +43,7 @@ export class AuthService {
       .pipe(
         map((account) => {
           this.accountSubject.next(account);
+          localStorage.setItem('account', JSON.stringify(account));
           this.startRefreshTokenTimer();
           return account;
         })
@@ -65,6 +67,7 @@ export class AuthService {
       .post<any>(`${authUrl}/logout`, {}, { withCredentials: true })
       .subscribe();
     this.stopRefreshTokenTimer();
+    localStorage.removeItem('account');
     this.accountSubject.next(null);
     this.router.navigate(['/account/login']);
   }
@@ -158,7 +161,7 @@ export class AuthService {
 
   private startRefreshTokenTimer() {
     // parse json object from base64 encoded jwt token
-    const jwtBase64 = this.accountValue!.jwtToken!.split('.')[1];
+    const jwtBase64 = this.accountValue!.jwt!.split('.')[1];
     const jwtToken = JSON.parse(window.atob(jwtBase64));
 
     // set a timeout to refresh the token a minute before it expires

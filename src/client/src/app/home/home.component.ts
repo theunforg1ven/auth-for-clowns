@@ -4,10 +4,10 @@ import { AuthService } from '../_services/auth.service';
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent {
-  account = this.authService?.accountValue;
+  account = this.authService.accountValue;
 
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService) {}
 }

@@ -12,14 +12,14 @@
             <div
               class="input-field"
               [class.error]="
-                loginForm.controls['username'].dirty &&
-                loginForm.hasError('required', 'username')
+                loginForm.controls['email'].dirty &&
+                loginForm.hasError('required', 'email')
               "
             >
               <input
-                formControlName="username"
+                formControlName="email"
                 type="text"
-                placeholder="Username"
+                placeholder="Email"
                 required
                 nbInput
                 fullWidth
@@ -28,8 +28,8 @@
           </div>
           <small
             *ngIf="
-              loginForm.controls['username'].dirty &&
-              loginForm.hasError('required', 'username')
+              loginForm.controls['email'].dirty &&
+              loginForm.hasError('required', 'email')
             "
             class="text-danger"
             >*Username is required</small
@@ -63,6 +63,7 @@
           <div class="form-inline fr mt-4">
             <a
               id="forgot"
+              routerLink="../forgot-password"
               data-bs-toggle="modal"
               data-bs-target="#exampleModal"
               class="forgot-password caption-2"
@@ -87,7 +88,7 @@
               id="forgot"
               status="info"
               size="small"
-              routerLink="/register"
+              routerLink="../register"
               >Register</a
             >
           </div>
