@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using StudyAuthApp.WebApi.AuthorizeHelpers;
 using StudyAuthApp.WebApi.DTOs;
@@ -61,7 +62,7 @@ namespace StudyAuthApp.WebApi.Controllers
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginDto loginDto)
+        public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
         {
             var authorizationHeader = Request.Headers["Authorization"];
 
@@ -78,7 +79,9 @@ namespace StudyAuthApp.WebApi.Controllers
 
             var cookieOptions = new CookieOptions
             {
-                HttpOnly = true
+                HttpOnly = true,
+                SameSite = SameSiteMode.None,
+                Secure = true,
             };
             Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
 
@@ -96,15 +99,26 @@ namespace StudyAuthApp.WebApi.Controllers
 
             HttpContext.Items["User"] = userFromRepo;
 
-            return Ok(new
+            //return Ok(new
+            //{
+            //    token = accessToken,
+            //});
+
+            return new UserDto
             {
-                token = accessToken,
-            });
+                Id = userFromRepo.Id,
+                FirstName = userFromRepo.FirstName,
+                LastName = userFromRepo.LastName,
+                Username = userFromRepo.Username,
+                Email = userFromRepo.Email,
+                Role = userFromRepo.Role,
+                Jwt = accessToken
+            };
         }
 
         [AllowAnonymous]
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh()
+        public async Task<ActionResult<UserDto>> Refresh()
         {
             var refreshToken = Request.Cookies["refreshToken"]?.ToString();
 
@@ -126,10 +140,23 @@ namespace StudyAuthApp.WebApi.Controllers
 
             var accessToken = _tokenService.CreateAccessToken(id);
 
-            return Ok(new
+            //return Ok(new
+            //{
+            //    token = accessToken,
+            //});
+
+            var userFromRepo = await _userRepository.GetUserById(id);
+
+            return new UserDto
             {
-                token = accessToken,
-            });
+                Id = userFromRepo.Id,
+                FirstName = userFromRepo.FirstName,
+                LastName = userFromRepo.LastName,
+                Username = userFromRepo.Username,
+                Email = userFromRepo.Email,
+                Role = userFromRepo.Role,
+                Jwt = accessToken
+            };
         }
 
         [AllowAnonymous]
