@@ -38,8 +38,13 @@ namespace StudyAuthApp.WebApi.Repositories
             user.Password = hashedPassword;
             user.Role = Role.User;
 
+            user.EmailVerificationToken = GenerateVerificationToken();
+            user.EmailTokenExpiresAt = DateTime.UtcNow.AddMinutes(30);
+
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
+
+            await SendVerificationEmail(user, origin);
 
             return user;
         }
@@ -186,7 +191,7 @@ namespace StudyAuthApp.WebApi.Repositories
             return savedChanges > 0;
         }
 
-        public async Task<bool> VerifyEmail(VerifyEmailDto emailDto)
+        public async Task<bool> VerifyEmailPostmanTest(VerifyEmailDto emailDto)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.EmailVerificationToken == emailDto.Token)
                 ?? throw new AppException("No user for verification!");
@@ -200,7 +205,26 @@ namespace StudyAuthApp.WebApi.Repositories
             user.EmailVerificationToken = null;
 
             _context.Users.Update(user);
-            var savedChanges = await _context.SaveChangesAsync();          
+            var savedChanges = await _context.SaveChangesAsync();
+
+            return savedChanges > 0;
+        }
+
+        public async Task<bool> VerifyEmail(string token)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.EmailVerificationToken == token)
+                ?? throw new AppException("No user for verification!");
+
+            if (user.IsEmailVerified || user.EmailTokenExpiresAt < DateTime.UtcNow)
+                return false;
+
+            user.EmailVerifiedAt = DateTime.UtcNow;
+            user.IsEmailVerified = true;
+            user.EmailTokenExpiresAt = default;
+            user.EmailVerificationToken = null;
+
+            _context.Users.Update(user);
+            var savedChanges = await _context.SaveChangesAsync();
 
             return savedChanges > 0;
         }
@@ -263,7 +287,7 @@ namespace StudyAuthApp.WebApi.Repositories
             string message;
             if (!string.IsNullOrEmpty(origin))
             {
-                var verifyUrl = $"{origin}/api/email/verify-email?token={user.EmailVerificationToken}";
+                var verifyUrl = $"{origin}/account/verify-email?token={user.EmailVerificationToken}";
                 message = $@"<p>Please click the below link to verify your email address:</p>
                             <p><a href=""{verifyUrl}"">verify your email</a></p>";
             }
@@ -286,7 +310,7 @@ namespace StudyAuthApp.WebApi.Repositories
             string message;
             if (!string.IsNullOrEmpty(origin))
             {
-                var resetUrl = $"{origin}/api/email/reset-password?token={resetToken.Token}";
+                var resetUrl = $"{origin}/account/reset-password?token={resetToken.Token}";
                 message = $@"<p>Please click the below link to reset your password! Link is available for 30 minutes</p>
                             <p><a href=""{resetUrl}"">reset password</a></p>";
             }
@@ -308,7 +332,7 @@ namespace StudyAuthApp.WebApi.Repositories
         {
             string message;
             if (!string.IsNullOrEmpty(origin))
-                message = $@"<p>If you don't know your password please visit the <a href=""{origin}/api/email/forgot-password"">forgot password</a> page.</p>";
+                message = $@"<p>If you don't know your password please visit the <a href=""{origin}/account/forgot-password"">forgot password</a> page.</p>";
             else
                 message = "<p>If you forgot your password you can reset it!</p>";
 

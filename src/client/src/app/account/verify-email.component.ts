@@ -5,6 +5,7 @@ import { AuthService } from '../_services/auth.service';
 
 enum EmailStatus {
   Verifying,
+  Success,
   Failed,
 }
 
@@ -30,10 +31,9 @@ export class VerifyEmailComponent implements OnInit {
       .pipe(first())
       .subscribe({
         next: () => {
-          console.log('Verification successful, you can now login', {
-            keepAfterRouteChange: true,
-          });
-          this.router.navigate(['../login'], { relativeTo: this.route });
+          console.log('Verification successful, you can now login');
+          this.emailStatus = EmailStatus.Success;
+          //this.router.navigate(['../login'], { relativeTo: this.route });
         },
         error: () => {
           this.emailStatus = EmailStatus.Failed;

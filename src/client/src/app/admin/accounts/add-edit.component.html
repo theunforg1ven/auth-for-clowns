@@ -6,7 +6,8 @@
       <input
         type="text"
         formControlName="firstName"
-        class="form-control"
+        nbInput
+        fullWidth
         [ngClass]="{ 'is-invalid': submitted && f['firstName'].errors }"
       />
       <div *ngIf="submitted && f['firstName'].errors" class="invalid-feedback">
@@ -20,7 +21,8 @@
       <input
         type="text"
         formControlName="lastName"
-        class="form-control"
+        nbInput
+        fullWidth
         [ngClass]="{ 'is-invalid': submitted && f['lastName'].errors }"
       />
       <div *ngIf="submitted && f['lastName'].errors" class="invalid-feedback">
@@ -36,7 +38,8 @@
       <input
         type="text"
         formControlName="email"
-        class="form-control"
+        nbInput
+        fullWidth
         [ngClass]="{ 'is-invalid': submitted && f['email'].errors }"
       />
       <div *ngIf="submitted && f['email'].errors" class="invalid-feedback">
@@ -48,15 +51,19 @@
     </div>
     <div class="mb-3 col-5">
       <label class="form-label">Role</label>
-      <select
-        formControlName="role"
-        class="form-select"
-        [ngClass]="{ 'is-invalid': submitted && f['role'].errors }"
-      >
-        <option value=""></option>
-        <option value="User">User</option>
-        <option value="Admin">Admin</option>
-      </select>
+      <div>
+        <nb-select
+          placeholder="Select role"
+          formControlName="role"
+          [ngClass]="{ 'is-invalid': submitted && f['role'].errors }"
+          [selected]="f['role'].value"
+          (selectedChange)="f['role'].setValue($event)"
+        >
+          <nb-option value="0">Admin</nb-option>
+          <nb-option value="1">User</nb-option>
+          <!-- <nb-option value="2">{{ f["role"].value }}</nb-option> -->
+        </nb-select>
+      </div>
       <div *ngIf="submitted && f['role'].errors" class="invalid-feedback">
         <div *ngIf="f['role'].errors['required']">Role is required</div>
       </div>
@@ -72,7 +79,8 @@
       <input
         type="password"
         formControlName="password"
-        class="form-control"
+        nbInput
+        fullWidth
         [ngClass]="{ 'is-invalid': submitted && f['password'].errors }"
       />
       <div *ngIf="submitted && f['password'].errors" class="invalid-feedback">
@@ -87,7 +95,8 @@
       <input
         type="password"
         formControlName="confirmPassword"
-        class="form-control"
+        nbInput
+        fullWidth
         [ngClass]="{ 'is-invalid': submitted && f['confirmPassword'].errors }"
       />
       <div
@@ -104,14 +113,18 @@
     </div>
   </div>
   <div class="mb-3">
-    <button [disabled]="submitting" class="btn btn-primary">
+    <button [disabled]="submitting" nbButton status="success" class="m-2">
       <span
         *ngIf="submitting"
         class="spinner-border spinner-border-sm me-1"
-      ></span>
+      ></span
+      ><nb-icon icon="save-outline" status="basic"></nb-icon>
       Save
     </button>
-    <a routerLink="/admin/accounts" class="btn btn-link">Cancel</a>
+    <a routerLink="/admin/accounts" nbButton status="warning" class="m-2"
+      ><nb-icon icon="arrow-circle-left-outline" status="basic"></nb-icon
+      >Cancel</a
+    >
   </div>
 </form>
 <div *ngIf="loading" class="text-center m-5">

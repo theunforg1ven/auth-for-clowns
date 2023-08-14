@@ -54,9 +54,43 @@
         nbInput
         fullWidth
         [ngClass]="{ 'is-invalid': submitted && f['role'].errors }"
-        [disabled]="account.role !== 0"
       />
     </div>
+  </div>
+
+  <div class="mb-3">
+    <button
+      type="submit"
+      [disabled]="submitting"
+      class="m-2"
+      nbButton
+      status="success"
+    >
+      <span
+        *ngIf="submitting"
+        class="spinner-border spinner-border-sm me-1"
+      ></span>
+      <nb-icon icon="edit-outline" status="basic"></nb-icon> Update
+    </button>
+    <button
+      type="button"
+      (click)="onDelete()"
+      [disabled]="deleting"
+      class="m-2"
+      nbButton
+      status="danger"
+    >
+      <nb-icon icon="trash-2-outline" status="basic"></nb-icon>
+      <span
+        *ngIf="deleting"
+        class="spinner-border spinner-border-sm me-1"
+      ></span>
+      Delete
+    </button>
+    <a routerLink="../" href="" class="m-2" nbButton status="warning"
+      ><nb-icon icon="arrow-circle-left-outline" status="basic"></nb-icon>
+      Cancel</a
+    >
   </div>
 
   <h3 class="pt-3">Change Email</h3>
@@ -104,6 +138,22 @@
     </div>
   </div>
 
+  <div class="mb-3">
+    <button
+      type="submit"
+      [disabled]="submitting"
+      class="m-2"
+      nbButton
+      status="info"
+    >
+      <span
+        *ngIf="submitting"
+        class="spinner-border spinner-border-sm me-1"
+      ></span>
+      <nb-icon icon="at-outline" status="basic"></nb-icon> Change email
+    </button>
+  </div>
+
   <h3 class="pt-3">Change Password</h3>
   <p>Leave blank to keep the same password</p>
   <div class="row">
@@ -144,39 +194,21 @@
         </div>
       </div>
     </div>
-  </div>
-  <div class="mb-3">
-    <button
-      type="submit"
-      [disabled]="submitting"
-      class="m-2"
-      nbButton
-      status="success"
-    >
-      <span
-        *ngIf="submitting"
-        class="spinner-border spinner-border-sm me-1"
-      ></span>
-      <nb-icon icon="edit-outline" status="basic"></nb-icon> Update
-    </button>
-    <button
-      type="button"
-      (click)="onDelete()"
-      [disabled]="deleting"
-      class="m-2"
-      nbButton
-      status="danger"
-    >
-      <nb-icon icon="trash-2-outline" status="basic"></nb-icon>
-      <span
-        *ngIf="deleting"
-        class="spinner-border spinner-border-sm me-1"
-      ></span>
-      Delete
-    </button>
-    <a routerLink="../" href="" class="m-2" nbButton status="warning"
-      ><nb-icon icon="arrow-circle-left-outline" status="basic"></nb-icon>
-      Cancel</a
-    >
+
+    <div class="mb-3">
+      <button
+        type="submit"
+        [disabled]="submitting"
+        class="m-2"
+        nbButton
+        status="info"
+      >
+        <span
+          *ngIf="submitting"
+          class="spinner-border spinner-border-sm me-1"
+        ></span>
+        <nb-icon icon="lock-outline" status="basic"></nb-icon> Change password
+      </button>
+    </div>
   </div>
 </form>

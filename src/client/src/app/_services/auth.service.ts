@@ -7,7 +7,7 @@ import { HttpClient } from '@angular/common/http';
 
 const authUrl = `${environment.apiUrl}/auth`;
 const userUrl = `${environment.apiUrl}/user`;
-const emailUrl = `${environment.apiUrl}/user`;
+const emailUrl = `${environment.apiUrl}/email`;
 const adminUrl = `${environment.apiUrl}/admin`;
 
 @Injectable({
@@ -123,7 +123,7 @@ export class AuthService {
   }
 
   getById(id: string) {
-    return this.http.get<Account>(`${userUrl}/user-by-id/${id}`);
+    return this.http.get<Account>(`${userUrl}/user-by-id/?id=${id}`);
   }
 
   // admin methods

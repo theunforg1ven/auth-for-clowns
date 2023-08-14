@@ -21,7 +21,7 @@ namespace StudyAuthApp.WebApi.Controllers
         [HttpPost("forgot-password")]
         public async Task<IActionResult> Forgot(ForgotDto forgotDTo)
         {
-           var resetToken = await _authRepo.CreateResetToken(forgotDTo, Request.Headers["origin"]);
+           var resetToken = await _authRepo.CreateResetToken(forgotDTo, Request.Headers["origin"]); // fix origin key bug
 
            var isTokenSaved = await _authRepo.AddResetToken(resetToken);
 
@@ -90,7 +90,24 @@ namespace StudyAuthApp.WebApi.Controllers
             if (emailDto.Token == null)
                 return Unauthorized("No token to verify email!");
 
-            var isEmailVerified = await _authRepo.VerifyEmail(emailDto);
+            var isEmailVerified = await _authRepo.VerifyEmail(emailDto.Token);
+
+            if (!isEmailVerified)
+                return NotFound("Email wasn't verified!"); ;
+
+            return Ok(new
+            {
+                message = "Verification successful, your email was verified!"
+            });
+        }
+
+        [HttpPost("verify-email-test")]
+        public async Task<IActionResult> VerifyEmailPostmanTest(VerifyEmailDto emailDto)
+        {
+            if (emailDto.Token == null)
+                return Unauthorized("No token to verify email!");
+
+            var isEmailVerified = await _authRepo.VerifyEmailPostmanTest(emailDto);
 
             if (!isEmailVerified)
                 return NotFound("Email wasn't verified!"); ;

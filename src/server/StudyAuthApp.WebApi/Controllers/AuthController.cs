@@ -173,7 +173,12 @@ namespace StudyAuthApp.WebApi.Controllers
             if (!isRefreshTokenAvailable)
                 return Unauthorized("No available refresh token in database!");
 
-            Response.Cookies.Delete("refreshToken");
+            Response.Cookies.Delete("refreshToken", new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None
+            });
 
             return Ok("Logged out without problems :)");
         }

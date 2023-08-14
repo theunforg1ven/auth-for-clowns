@@ -12,6 +12,7 @@ import {
   NbInputModule,
   NbButtonModule,
   NbUserModule,
+  NbSelectModule,
 } from '@nebular/theme';
 
 @NgModule({
@@ -25,6 +26,7 @@ import {
     NbInputModule,
     NbButtonModule,
     NbUserModule,
+    NbSelectModule,
   ],
   declarations: [ListComponent, AddEditComponent],
 })

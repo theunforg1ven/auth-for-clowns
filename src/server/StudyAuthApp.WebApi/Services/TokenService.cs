@@ -31,7 +31,7 @@ namespace StudyAuthApp.WebApi.Services
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddSeconds(60),
+                Expires = DateTime.Now.AddHours(2),
                 SigningCredentials = creds,
                 Issuer = _config["Secrets:JwtTokenIssuer"]
             };
