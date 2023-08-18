@@ -129,11 +129,11 @@ export class AuthService {
   // admin methods
 
   create(params: any) {
-    return this.http.post(adminUrl, params);
+    return this.http.post(`${adminUrl}/create-user`, params);
   }
 
   update(id: string, params: any) {
-    return this.http.put(`${adminUrl}/update-user/${id}`, params).pipe(
+    return this.http.put(`${adminUrl}/update-user/?id=${id}`, params).pipe(
       map((account: any) => {
         // update the current account if it was updated
         if (account.id === this.accountValue?.id) {
@@ -147,7 +147,7 @@ export class AuthService {
   }
 
   delete(id: string) {
-    return this.http.delete(`${adminUrl}/update-user/${id}`).pipe(
+    return this.http.delete(`${adminUrl}/delete-user/?id=${id}`).pipe(
       finalize(() => {
         // auto logout if the logged in account was deleted
         if (id === this.accountValue?.id) this.logout();

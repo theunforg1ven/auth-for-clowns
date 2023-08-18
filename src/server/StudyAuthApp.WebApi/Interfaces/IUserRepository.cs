@@ -1,4 +1,5 @@
-﻿using StudyAuthApp.WebApi.Helpers;
+﻿using StudyAuthApp.WebApi.DTOs;
+using StudyAuthApp.WebApi.Helpers;
 using StudyAuthApp.WebApi.Models;
 
 namespace StudyAuthApp.WebApi.Interfaces
@@ -22,5 +23,7 @@ namespace StudyAuthApp.WebApi.Interfaces
         Task<bool> UserExistsByEmail(string email);
 
         Task<bool> UserExistsByUsername(string username);
+
+        Task<bool> UpdateInformation(int id, UpdateUserInfoDto updateUserInfoDto);
     }
 }

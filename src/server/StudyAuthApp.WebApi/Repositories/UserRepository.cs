@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using StudyAuthApp.WebApi.Data;
+using StudyAuthApp.WebApi.DTOs;
 using StudyAuthApp.WebApi.Helpers;
 using StudyAuthApp.WebApi.Interfaces;
 using StudyAuthApp.WebApi.Models;
@@ -16,6 +17,8 @@ namespace StudyAuthApp.WebApi.Repositories
             _context = context;
             _config = config;
         }
+
+        #region Get User methods
 
         public async Task<User> GetUserById(int id)
         {
@@ -83,6 +86,10 @@ namespace StudyAuthApp.WebApi.Repositories
             return users;
         }
 
+        #endregion
+
+        #region Is User exist
+
         public async Task<bool> UserExistsById(int userId)
             => await _context.Users.AnyAsync(x => x.Id == userId);
 
@@ -91,5 +98,23 @@ namespace StudyAuthApp.WebApi.Repositories
 
         public async Task<bool> UserExistsByUsername(string username)
             => await _context.Users.AnyAsync(x => x.Username == username);
+
+        #endregion
+
+        public async Task<bool> UpdateInformation(int id, UpdateUserInfoDto updateUserInfoDto)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id)
+                ?? throw new AppException("No user found to update!");
+
+            user.FirstName = updateUserInfoDto.FirstName ?? user.FirstName;
+            user.LastName = updateUserInfoDto.LastName ?? user.LastName;
+            user.Username = updateUserInfoDto.Username ?? user.Username;
+            user.Role = (Role)updateUserInfoDto.Role;
+
+            _context.Users.Update(user);
+            var isChanged = await _context.SaveChangesAsync();
+
+            return isChanged > 0;
+        }
     }
 }

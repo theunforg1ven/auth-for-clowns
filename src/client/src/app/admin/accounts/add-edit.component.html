@@ -1,7 +1,7 @@
 ﻿<h1>{{ title }}</h1>
 <form *ngIf="!loading" [formGroup]="form" (ngSubmit)="onSubmit()">
   <div class="row">
-    <div class="mb-3 col-5">
+    <div class="mb-3 col-6">
       <label class="form-label">First Name</label>
       <input
         type="text"
@@ -16,7 +16,7 @@
         </div>
       </div>
     </div>
-    <div class="mb-3 col-5">
+    <div class="mb-3 col-6">
       <label class="form-label">Last Name</label>
       <input
         type="text"
@@ -33,7 +33,23 @@
     </div>
   </div>
   <div class="row">
-    <div class="mb-3 col-7">
+    <div class="mb-3 col-6">
+      <label class="form-label">Username </label>
+      <input
+        type="text"
+        formControlName="username"
+        nbInput
+        fullWidth
+        [ngClass]="{ 'is-invalid': submitted && f['username'].errors }"
+      />
+      <div *ngIf="submitted && f['username'].errors" class="invalid-feedback">
+        <div *ngIf="f['username'].errors['username']">Username is required</div>
+        <div *ngIf="f['username'].errors['username']">
+          Username must be a valid username address
+        </div>
+      </div>
+    </div>
+    <div class="mb-3 col-4">
       <label class="form-label">Email</label>
       <input
         type="text"
@@ -49,7 +65,7 @@
         </div>
       </div>
     </div>
-    <div class="mb-3 col-5">
+    <div class="mb-3 col-2">
       <label class="form-label">Role</label>
       <div>
         <nb-select
@@ -87,27 +103,6 @@
         <div *ngIf="f['password'].errors['required']">Password is required</div>
         <div *ngIf="f['password'].errors['minlength']">
           Password must be at least 6 characters
-        </div>
-      </div>
-    </div>
-    <div class="mb-3 col">
-      <label class="form-label">Confirm Password</label>
-      <input
-        type="password"
-        formControlName="confirmPassword"
-        nbInput
-        fullWidth
-        [ngClass]="{ 'is-invalid': submitted && f['confirmPassword'].errors }"
-      />
-      <div
-        *ngIf="submitted && f['confirmPassword'].errors"
-        class="invalid-feedback"
-      >
-        <div *ngIf="f['confirmPassword'].errors['required']">
-          Confirm Password is required
-        </div>
-        <div *ngIf="f['confirmPassword'].errors['passwordMatch']">
-          Passwords must match
         </div>
       </div>
     </div>

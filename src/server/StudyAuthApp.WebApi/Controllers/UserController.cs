@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StudyAuthApp.WebApi.AuthorizeHelpers;
+using StudyAuthApp.WebApi.DTOs;
 using StudyAuthApp.WebApi.Helpers;
 using StudyAuthApp.WebApi.Interfaces;
+using StudyAuthApp.WebApi.Repositories;
 
 namespace StudyAuthApp.WebApi.Controllers
 {
@@ -145,6 +147,31 @@ namespace StudyAuthApp.WebApi.Controllers
                 return NotFound("Such user does not exist!");
 
             return Ok("User exist");
+        }
+
+        [HttpPut("update-user-info")]
+        public async Task<IActionResult> Update(int id, UpdateUserInfoDto updateUserDto)
+        {
+            var currentUser = await _userRepo.GetUserById(id);
+
+            if (currentUser == null)
+                return BadRequest("No user with such Id!");
+
+            if (id != currentUser.Id && currentUser.Role != Role.Admin)
+                return Unauthorized("You don't have rights to do update!");
+
+            if (currentUser.Role != Role.Admin)
+                updateUserDto.Role = (int)currentUser.Role;
+
+            var isUserUpdated = await _userRepo.UpdateInformation(id, updateUserDto);
+
+            if (!isUserUpdated)
+                return BadRequest("Error updating user!");
+
+            return Ok(new
+            {
+                message = "User was successfully updated!",
+            });
         }
     }
 }

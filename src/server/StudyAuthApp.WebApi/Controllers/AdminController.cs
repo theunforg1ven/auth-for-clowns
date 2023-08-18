@@ -66,13 +66,18 @@ namespace StudyAuthApp.WebApi.Controllers
         [HttpPut("update-user")]
         public async Task<IActionResult> Update(int id, UpdateUserDto updateUserDto)
         {
-            var currentUser = await GetCurrentUser();
+            var currentUser = await _userRepository.GetUserById(id);
+
+            if (currentUser == null)
+                return BadRequest("No user with such Id!");
 
             if (id != currentUser.Id && currentUser.Role != Role.Admin)
                 return Unauthorized("You don't have rights to do update!");
 
-            if (currentUser.Role != Role.Admin)
-                updateUserDto.Role = (int)currentUser.Role;
+            var isRoleParsed = Enum.TryParse(updateUserDto.Role, out Role userRole);
+
+            if (!isRoleParsed)
+                throw new AppException($"Entered user role during update is incorrect");
 
             var isUserUpdated = await _adminRepository.Update(id, updateUserDto);
 
@@ -88,7 +93,7 @@ namespace StudyAuthApp.WebApi.Controllers
         [HttpDelete("delete-user")]
         public async Task<IActionResult> Delete(int id)
         {
-            var currentUser = await GetCurrentUser();
+            var currentUser = await _userRepository.GetUserById(id);
 
             if (id != currentUser.Id && currentUser.Role != Role.Admin)
                 return Unauthorized("You don't have rights to do update!");
@@ -99,31 +104,6 @@ namespace StudyAuthApp.WebApi.Controllers
             { 
                 message = "Account deleted successfully" 
             });
-        }
-
-        private async Task<User> GetCurrentUser()
-        {
-            var authorizationHeader = Request.Headers["Authorization"].ToString();
-
-            if (authorizationHeader == null || authorizationHeader.Length <= 8)
-                throw new AppException($"No authorization header found!");
-
-            var accessToken = authorizationHeader[7..];
-
-            var id = _tokenService.DecodeToken(accessToken, out bool hasTokenExpired);
-
-            if (id == -1)
-                return null;
-
-            if (hasTokenExpired)
-                throw new AppException($"No current user, token has expired!");
-
-            var user = await _userRepository.GetUserById(id);
-
-            if (user == null)
-                throw new AppException($"No user found!");
-
-            return user;
         }
     }
 }

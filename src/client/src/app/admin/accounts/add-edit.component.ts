@@ -24,24 +24,18 @@ export class AddEditComponent implements OnInit {
   ngOnInit() {
     this.id = this.route.snapshot.params['id'];
 
-    this.form = this.formBuilder.group(
-      {
-        title: ['', Validators.required],
-        firstName: ['', Validators.required],
-        lastName: ['', Validators.required],
-        email: ['', [Validators.required, Validators.email]],
-        role: ['', Validators.required],
-        // password only required in add mode
-        password: [
-          '',
-          [Validators.minLength(6), ...(!this.id ? [Validators.required] : [])],
-        ],
-        confirmPassword: [''],
-      },
-      {
-        validator: PasswordMatch('password', 'confirmPassword'),
-      }
-    );
+    this.form = this.formBuilder.group({
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
+      username: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      role: ['', Validators.required],
+      // password only required in add mode
+      password: [
+        '',
+        [Validators.minLength(6), ...(!this.id ? [Validators.required] : [])],
+      ],
+    });
 
     this.title = 'Create Account';
     if (this.id) {
@@ -54,6 +48,7 @@ export class AddEditComponent implements OnInit {
         .subscribe((x) => {
           this.form.patchValue(x);
           this.loading = false;
+          this.form.get('password')?.setValue('');
         });
     }
   }
@@ -65,9 +60,11 @@ export class AddEditComponent implements OnInit {
 
   onSubmit() {
     this.submitted = true;
+    console.log(this.form);
 
     // stop here if form is invalid
     if (this.form.invalid) {
+      console.log(this.form.errors);
       return;
     }
 

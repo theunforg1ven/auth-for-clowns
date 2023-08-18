@@ -2,9 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using StudyAuthApp.WebApi.Data;
 using StudyAuthApp.WebApi.DTOs;
+using StudyAuthApp.WebApi.Extensions;
 using StudyAuthApp.WebApi.Helpers;
 using StudyAuthApp.WebApi.Interfaces;
 using StudyAuthApp.WebApi.Models;
+using System;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -76,7 +78,7 @@ namespace StudyAuthApp.WebApi.Repositories
                     && await _context.Users.AnyAsync(x => x.Email == updateUserDto.Email))
                 throw new AppException($"Email '{updateUserDto.Email}' is already registered");
 
-            if (!string.IsNullOrEmpty(updateUserDto.Email))
+            if (string.IsNullOrEmpty(updateUserDto.Email))
             {
                 user.EmailVerifiedAt = default;
                 user.IsEmailVerified = false;
@@ -89,7 +91,7 @@ namespace StudyAuthApp.WebApi.Repositories
             user.LastName = updateUserDto.LastName ?? user.LastName;
             user.Username = updateUserDto.Username ?? user.Username;
             user.Email = updateUserDto.Email ?? user.Email;
-            user.Role = (Role)updateUserDto.Role;
+            user.Role = updateUserDto.Role.ParseEnum<Role>();
 
             _context.Users.Update(user);
             var isChanged = await _context.SaveChangesAsync();

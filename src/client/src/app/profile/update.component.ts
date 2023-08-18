@@ -37,6 +37,12 @@ export class UpdateComponent implements OnInit {
         validator: PasswordMatch('password', 'confirmPassword'),
       }
     );
+
+    if (this.account.role !== 0) {
+      this.form.get('role')?.disable();
+    } else {
+      this.form.get('role')?.enable();
+    }
   }
 
   // convenience getter for easy access to form fields

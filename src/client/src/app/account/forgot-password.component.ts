@@ -3,11 +3,18 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first, finalize } from 'rxjs/operators';
 import { AuthService } from '../_services/auth.service';
 
+enum Status {
+  Valid,
+  Invalid,
+}
+
 @Component({ templateUrl: 'forgot-password.component.html' })
 export class ForgotPasswordComponent implements OnInit {
   form!: FormGroup;
   loading = false;
   submitted = false;
+  Status = Status;
+  status = Status.Invalid;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -45,5 +52,6 @@ export class ForgotPasswordComponent implements OnInit {
           ),
         error: (error) => console.error(error),
       });
+    this.status = Status.Valid;
   }
 }
