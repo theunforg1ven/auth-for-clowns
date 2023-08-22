@@ -1,13 +1,14 @@
 ﻿import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
 import { AuthService } from '../_services/auth.service';
-import { PasswordMatch } from '../_helpers/password-match.validator';
+import { Account } from '../_models/account';
 
 @Component({ templateUrl: 'update.component.html' })
 export class UpdateComponent implements OnInit {
-  account = this.authService.accountValue!;
+  //account = this.authService.accountValue!;
+  account!: Account | null;
   form!: FormGroup;
   submitting = false;
   submitted = false;
@@ -15,34 +16,32 @@ export class UpdateComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private route: ActivatedRoute,
     private router: Router,
     private authService: AuthService
   ) {}
 
   ngOnInit() {
+    this.authService
+      .getCurrentUser()
+      .pipe(first())
+      .subscribe((x) => {
+        this.account = x;
+        this.form.patchValue(x);
+      });
     this.form = this.formBuilder.group(
       {
-        title: [this.account.username, Validators.required],
-        firstName: [this.account.firstName, Validators.required],
-        lastName: [this.account.lastName, Validators.required],
-        username: [this.account.username, Validators.required],
-        role: [this.account.role, Validators.required],
-        email: [this.account.email, [Validators.required, Validators.email]],
-        confirmEmail: [this.account.email, ''],
-        password: ['', [Validators.minLength(6)]],
-        confirmPassword: [''],
-      },
-      {
-        validator: PasswordMatch('password', 'confirmPassword'),
+        firstName: [this.account?.firstName, Validators.required],
+        lastName: [this.account?.lastName, Validators.required],
+        username: [this.account?.username, Validators.required],
+        // email: [this.account.email, [Validators.required, Validators.email]],
+        // confirmEmail: [this.account.email, ''],
+        // password: ['', [Validators.minLength(6)]],
+        // confirmPassword: [''],
       }
+      // {
+      //   validator: PasswordMatch('password', 'confirmPassword'),
+      // }
     );
-
-    if (this.account.role !== 0) {
-      this.form.get('role')?.disable();
-    } else {
-      this.form.get('role')?.enable();
-    }
   }
 
   // convenience getter for easy access to form fields
@@ -50,7 +49,7 @@ export class UpdateComponent implements OnInit {
     return this.form.controls;
   }
 
-  onSubmit() {
+  onUpdateUser() {
     this.submitted = true;
 
     // stop here if form is invalid
@@ -59,29 +58,23 @@ export class UpdateComponent implements OnInit {
     }
 
     this.submitting = true;
-    this.authService
-      .update(this.account.id!, this.form.value)
+    this.authService;
+
+    // easy way to update /profile page
+    let saveAccount;
+    saveAccount = () =>
+      this.authService.updateUserInfo(this.account?.id!, this.form.value);
+
+    saveAccount()
       .pipe(first())
       .subscribe({
         next: () => {
-          this.router.navigate(['../'], { relativeTo: this.route });
+          this.router.navigateByUrl('/profile');
         },
         error: (error) => {
+          console.error(error);
           this.submitting = false;
-          console.log(error);
         },
       });
-  }
-
-  onDelete() {
-    if (confirm('Are you sure?')) {
-      this.deleting = true;
-      this.authService
-        .delete(this.account.id!)
-        .pipe(first())
-        .subscribe(() => {
-          console.log('Account deleted successfully');
-        });
-    }
   }
 }

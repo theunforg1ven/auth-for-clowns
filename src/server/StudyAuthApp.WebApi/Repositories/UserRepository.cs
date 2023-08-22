@@ -109,7 +109,6 @@ namespace StudyAuthApp.WebApi.Repositories
             user.FirstName = updateUserInfoDto.FirstName ?? user.FirstName;
             user.LastName = updateUserInfoDto.LastName ?? user.LastName;
             user.Username = updateUserInfoDto.Username ?? user.Username;
-            user.Role = (Role)updateUserInfoDto.Role;
 
             _context.Users.Update(user);
             var isChanged = await _context.SaveChangesAsync();

@@ -1,5 +1,5 @@
 ﻿<h1>Update Profile</h1>
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
+<form [formGroup]="form" (ngSubmit)="onUpdateUser()">
   <div class="row">
     <div class="mb-3 col-5">
       <label class="form-label">First Name</label>
@@ -16,6 +16,8 @@
         </div>
       </div>
     </div>
+  </div>
+  <div class="row">
     <div class="mb-3 col-5">
       <label class="form-label">Last Name</label>
       <input
@@ -46,16 +48,6 @@
         <div *ngIf="f['username'].errors['required']">Username is required</div>
       </div>
     </div>
-    <div class="mb-3 col-5">
-      <label class="form-label">Role</label>
-      <input
-        type="text"
-        formControlName="role"
-        nbInput
-        fullWidth
-        [ngClass]="{ 'is-invalid': submitted && f['role'].errors }"
-      />
-    </div>
   </div>
 
   <div class="mb-3">
@@ -72,27 +64,14 @@
       ></span>
       <nb-icon icon="edit-outline" status="basic"></nb-icon> Update
     </button>
-    <button
-      type="button"
-      (click)="onDelete()"
-      [disabled]="deleting"
-      class="m-2"
-      nbButton
-      status="danger"
-    >
-      <nb-icon icon="trash-2-outline" status="basic"></nb-icon>
-      <span
-        *ngIf="deleting"
-        class="spinner-border spinner-border-sm me-1"
-      ></span>
-      Delete
-    </button>
     <a routerLink="../" href="" class="m-2" nbButton status="warning"
       ><nb-icon icon="arrow-circle-left-outline" status="basic"></nb-icon>
       Cancel</a
     >
   </div>
+</form>
 
+<!-- <form>
   <h3 class="pt-3">Change Email</h3>
   <p>Leave blank to keep the same email</p>
   <div class="row">
@@ -153,7 +132,9 @@
       <nb-icon icon="at-outline" status="basic"></nb-icon> Change email
     </button>
   </div>
+</form>
 
+<form>
   <div class="row">
     <div class="mb-3 col">
       <label class="form-label">Password</label>
@@ -209,4 +190,4 @@
       </button>
     </div>
   </div>
-</form>
+</form> -->

@@ -126,6 +126,20 @@ export class AuthService {
     return this.http.get<Account>(`${userUrl}/user-by-id/?id=${id}`);
   }
 
+  updateUserInfo(id: string, params: any) {
+    return this.http.put(`${userUrl}/update-user-info/?id=${id}`, params).pipe(
+      map((account: any) => {
+        // update the current account if it was updated
+        if (account.id === this.accountValue?.id) {
+          // publish updated account to subscribers
+          account = { ...this.accountValue, ...account };
+          this.accountSubject.next(account);
+        }
+        return account;
+      })
+    );
+  }
+
   // admin methods
 
   create(params: any) {

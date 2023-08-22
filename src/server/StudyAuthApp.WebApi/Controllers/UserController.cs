@@ -157,12 +157,6 @@ namespace StudyAuthApp.WebApi.Controllers
             if (currentUser == null)
                 return BadRequest("No user with such Id!");
 
-            if (id != currentUser.Id && currentUser.Role != Role.Admin)
-                return Unauthorized("You don't have rights to do update!");
-
-            if (currentUser.Role != Role.Admin)
-                updateUserDto.Role = (int)currentUser.Role;
-
             var isUserUpdated = await _userRepo.UpdateInformation(id, updateUserDto);
 
             if (!isUserUpdated)
