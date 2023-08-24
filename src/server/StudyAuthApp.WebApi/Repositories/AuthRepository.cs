@@ -229,15 +229,39 @@ namespace StudyAuthApp.WebApi.Repositories
             return savedChanges > 0;
         }
 
+        public async Task<bool> ChangeEmailRequest(ChangeEmailRequestDto emailDto, string origin)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == emailDto.Email)
+                ?? throw new AppException("No user found to change email!");
+
+            user.EmailChangeToken = GenerateVerificationToken();
+            user.EmailChangeTokenExpiresAt = DateTime.UtcNow.AddMinutes(30);
+
+            _context.Users.Update(user);
+            var savedChanges = await _context.SaveChangesAsync();
+
+            await SendChangeEmail(user, origin);
+
+            return savedChanges > 0;
+        }
+
         public async Task<bool> ChangeEmail(ChangeEmailDto emailDto, string origin)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == emailDto.CurrentEmail)
                 ?? throw new AppException("No user for verification!");
 
+            if (user.EmailChangeTokenExpiresAt < DateTime.UtcNow)
+                return false;
+
             if (!VerifyPasswordHash(emailDto.Password, user.Password))
                 return false;
 
             user.Email = emailDto.NewEmail;
+
+            user.EmailChangeToken = null;
+            user.EmailChangeTokenExpiresAt = default;
+            user.EmailChangedAt = DateTime.UtcNow;
+
             user.EmailVerifiedAt = default;
             user.IsEmailVerified = false;
             user.EmailVerificationToken = GenerateVerificationToken();
@@ -301,6 +325,29 @@ namespace StudyAuthApp.WebApi.Repositories
                 to: user.Email,
                 subject: "Email verification",
                 html: $@"<h4>Verify Email</h4>
+                        {message}"
+            );
+        }
+
+        private async Task SendChangeEmail(User user, string origin)
+        {
+            string message;
+            if (!string.IsNullOrEmpty(origin))
+            {
+                var verifyUrl = $"{origin}/profile/change-email?token={user.EmailChangeToken}";
+                message = $@"<p>Please click the below link to change your email address:</p>
+                            <p><a href=""{verifyUrl}"">change your email</a></p>";
+            }
+            else
+            {
+                message = $@"<p>Please use the below token to change your email address</p>
+                            <p><code>{user.EmailChangeToken}</code></p>";
+            }
+
+            await _emailService.Send(
+                to: user.Email,
+                subject: "Email change",
+                html: $@"<h4>Change Email</h4>
                         {message}"
             );
         }

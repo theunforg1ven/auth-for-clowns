@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
 import { AuthService } from '../_services/auth.service';
 import { Account } from '../_models/account';
+import { NbGlobalLogicalPosition, NbToastrService } from '@nebular/theme';
 
 @Component({ templateUrl: 'update.component.html' })
 export class UpdateComponent implements OnInit {
@@ -13,11 +14,13 @@ export class UpdateComponent implements OnInit {
   submitting = false;
   submitted = false;
   deleting = false;
+  logicalPosition = NbGlobalLogicalPosition;
 
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private toastrService: NbToastrService
   ) {}
 
   ngOnInit() {
@@ -28,20 +31,11 @@ export class UpdateComponent implements OnInit {
         this.account = x;
         this.form.patchValue(x);
       });
-    this.form = this.formBuilder.group(
-      {
-        firstName: [this.account?.firstName, Validators.required],
-        lastName: [this.account?.lastName, Validators.required],
-        username: [this.account?.username, Validators.required],
-        // email: [this.account.email, [Validators.required, Validators.email]],
-        // confirmEmail: [this.account.email, ''],
-        // password: ['', [Validators.minLength(6)]],
-        // confirmPassword: [''],
-      }
-      // {
-      //   validator: PasswordMatch('password', 'confirmPassword'),
-      // }
-    );
+    this.form = this.formBuilder.group({
+      firstName: [this.account?.firstName, Validators.required],
+      lastName: [this.account?.lastName, Validators.required],
+      username: [this.account?.username, Validators.required],
+    });
   }
 
   // convenience getter for easy access to form fields
@@ -73,8 +67,27 @@ export class UpdateComponent implements OnInit {
         },
         error: (error) => {
           console.error(error);
+          this.toastrService.danger('Error', `Changes wan't saved`);
           this.submitting = false;
         },
       });
+  }
+
+  onChangeEmail() {
+    this.authService.changeEmailRequest(this.account?.email!).subscribe({
+      next: () => {
+        this.toastrService.success(
+          'Success',
+          `Email was sent to ${this.account?.email}`
+        );
+      },
+      error: (error) => {
+        console.error(error);
+        this.toastrService.danger(
+          'Error',
+          `Email wasn't sent to ${this.account?.email}`
+        );
+      },
+    });
   }
 }

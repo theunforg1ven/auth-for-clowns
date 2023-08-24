@@ -118,6 +118,23 @@ namespace StudyAuthApp.WebApi.Controllers
             });
         }
 
+        [HttpPost("change-email-request")]
+        public async Task<IActionResult> ChangeEmailRequest(ChangeEmailRequestDto emailDto)
+        {
+            if (emailDto == null)
+                return NotFound("No email to change!");
+
+            var isEmailChangeSent = await _authRepo.ChangeEmailRequest(emailDto, Request.Headers["origin"]);
+
+            if (!isEmailChangeSent)
+                return NotFound("Change email wasn't sent!"); ;
+
+            return Ok(new
+            {
+                message = "Email change successful, verify your new email!"
+            });
+        }
+
         [HttpPost("change-email")]
         public async Task<IActionResult> ChangeEmail(ChangeEmailDto emailDto)
         {

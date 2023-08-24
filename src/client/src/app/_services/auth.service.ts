@@ -72,7 +72,7 @@ export class AuthService {
     this.router.navigate(['/account/login']);
   }
 
-  // email methods
+  // password reset methods
 
   forgotPassword(email: string) {
     return this.http.post(`${emailUrl}/forgot-password`, { email });
@@ -90,6 +90,8 @@ export class AuthService {
     });
   }
 
+  // confirm email methods
+
   confirmEmail(email: string) {
     return this.http.post(`${emailUrl}/confirm-email`, { email });
   }
@@ -98,13 +100,21 @@ export class AuthService {
     return this.http.post(`${emailUrl}/verify-email`, { token });
   }
 
+  // change email methods
+
+  changeEmailRequest(email: string) {
+    return this.http.post(`${emailUrl}/change-email-request`, { email });
+  }
+
   changeEmail(
+    token: string,
     currentEmail: string,
     newEmail: string,
     password: string,
     confirmPassword: string
   ) {
     return this.http.post(`${emailUrl}/change-email`, {
+      token,
       currentEmail,
       newEmail,
       password,

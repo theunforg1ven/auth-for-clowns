@@ -12,9 +12,12 @@ import {
   NbInputModule,
   NbLayoutModule,
   NbThemeModule,
+  NbToastrModule,
   NbUserModule,
 } from '@nebular/theme';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
+import { ChangeEmailComponent } from './change-email/change-email.component';
+import { ChangePasswordComponent } from './change-password/change-password.component';
 
 @NgModule({
   imports: [
@@ -27,7 +30,8 @@ import { NbEvaIconsModule } from '@nebular/eva-icons';
     NbInputModule,
     NbButtonModule,
     NbUserModule,
+    NbToastrModule.forRoot(),
   ],
-  declarations: [LayoutComponent, DetailsComponent, UpdateComponent],
+  declarations: [LayoutComponent, DetailsComponent, UpdateComponent, ChangeEmailComponent, ChangePasswordComponent],
 })
 export class ProfileModule {}

@@ -29,6 +29,8 @@ namespace StudyAuthApp.WebApi.Interfaces
 
         Task<bool> VerifyEmailPostmanTest(VerifyEmailDto emailDto);
 
+        Task<bool> ChangeEmailRequest(ChangeEmailRequestDto emailDto, string origin);
+
         Task<bool> ChangeEmail(ChangeEmailDto emailDto, string origin);
     }
 }

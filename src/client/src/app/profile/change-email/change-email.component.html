@@ -1,0 +1,116 @@
+<h1>Change email</h1>
+<form [formGroup]="form" (ngSubmit)="onChangeUserEmail()">
+  <h3 class="pt-3">Change Email</h3>
+  <p>Leave blank to keep the same email</p>
+  <div class="row">
+    <div class="mb-3 col">
+      <label class="form-label">Old Email</label>
+      <input
+        type="text"
+        formControlName="oldEmail"
+        nbInput
+        fullWidth
+        [ngClass]="{ 'is-invalid': submitted && f['oldEmail'].errors }"
+      />
+      <div *ngIf="submitted && f['oldEmail'].errors" class="invalid-feedback">
+        <div *ngIf="f['oldEmail'].errors['required']">Email is required</div>
+        <div *ngIf="f['oldEmail'].errors['oldEmail']">
+          Email must be a valid email address
+        </div>
+      </div>
+    </div>
+    <div class="mb-3 col">
+      <label class="form-label">New Email</label>
+      <input
+        type="text"
+        formControlName="newEmail"
+        nbInput
+        fullWidth
+        [ngClass]="{ 'is-invalid': submitted && f['newEmail'].errors }"
+      />
+      <div *ngIf="submitted && f['newEmail'].errors" class="invalid-feedback">
+        <div *ngIf="f['newEmail'].errors['newEmail']">
+          Email must be a valid email address
+        </div>
+        <div *ngIf="f['newEmail'].errors['required']">
+          Confirm Email is required
+        </div>
+        <div *ngIf="f['newEmail'].errors['passwordMatch']">
+          Emails must match
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="mb-3 col">
+      <label class="form-label">Password</label>
+      <input
+        type="password"
+        formControlName="password"
+        nbInput
+        fullWidth
+        [ngClass]="{ 'is-invalid': submitted && f['password'].errors }"
+      />
+      <div *ngIf="submitted && f['password'].errors" class="invalid-feedback">
+        <div *ngIf="f['password'].errors['required']">Password is required</div>
+        <div *ngIf="f['password'].errors['minlength']">
+          Password must be at least 6 characters
+        </div>
+      </div>
+    </div>
+    <div class="mb-3 col">
+      <label class="form-label">Confirm Password</label>
+      <input
+        type="password"
+        formControlName="confirmPassword"
+        nbInput
+        fullWidth
+        [ngClass]="{ 'is-invalid': submitted && f['confirmPassword'].errors }"
+      />
+      <div
+        *ngIf="submitted && f['confirmPassword'].errors"
+        class="invalid-feedback"
+      >
+        <div *ngIf="f['confirmPassword'].errors['required']">
+          Confirm Password is required
+        </div>
+        <div *ngIf="f['confirmPassword'].errors['passwordMatch']">
+          Passwords must match
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <button
+        type="submit"
+        [disabled]="submitting"
+        class="m-2"
+        nbButton
+        status="info"
+      >
+        <span
+          *ngIf="submitting"
+          class="spinner-border spinner-border-sm me-1"
+        ></span>
+        <nb-icon icon="at-outline" status="basic"></nb-icon> Change email
+      </button>
+    </div>
+
+    <!-- <div class="mb-3">
+      <button
+        type="submit"
+        [disabled]="submitting"
+        class="m-2"
+        nbButton
+        status="info"
+      >
+        <span
+          *ngIf="submitting"
+          class="spinner-border spinner-border-sm me-1"
+        ></span>
+        <nb-icon icon="lock-outline" status="basic"></nb-icon> Change password
+      </button>
+    </div> -->
+  </div>
+</form>
