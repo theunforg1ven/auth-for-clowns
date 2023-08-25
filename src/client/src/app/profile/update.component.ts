@@ -90,4 +90,22 @@ export class UpdateComponent implements OnInit {
       },
     });
   }
+
+  onChangePassword() {
+    this.authService.changePasswordRequest(this.account?.email!).subscribe({
+      next: () => {
+        this.toastrService.success(
+          'Success',
+          `Email was sent to ${this.account?.email}`
+        );
+      },
+      error: (error) => {
+        console.error(error);
+        this.toastrService.danger(
+          'Error',
+          `Email wasn't sent to ${this.account?.email}`
+        );
+      },
+    });
+  }
 }

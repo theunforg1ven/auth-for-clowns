@@ -122,6 +122,26 @@ export class AuthService {
     });
   }
 
+  // change password methods
+
+  changePasswordRequest(email: string) {
+    return this.http.post(`${emailUrl}/change-password-request`, { email });
+  }
+
+  changePassword(
+    token: string,
+    oldPassword: string,
+    newPassword: string,
+    confirmNewPassword: string
+  ) {
+    return this.http.post(`${emailUrl}/change-password`, {
+      token,
+      oldPassword,
+      newPassword,
+      confirmNewPassword,
+    });
+  }
+
   // user methods
 
   getCurrentUser() {

@@ -21,7 +21,7 @@ namespace StudyAuthApp.WebApi.Controllers
         [HttpPost("forgot-password")]
         public async Task<IActionResult> Forgot(ForgotDto forgotDTo)
         {
-           var resetToken = await _authRepo.CreateResetToken(forgotDTo, Request.Headers["origin"]); // fix origin key bug
+           var resetToken = await _authRepo.CreateResetToken(forgotDTo, Request.Headers["origin"]); 
 
            var isTokenSaved = await _authRepo.AddResetToken(resetToken);
 
@@ -131,7 +131,7 @@ namespace StudyAuthApp.WebApi.Controllers
 
             return Ok(new
             {
-                message = "Email change successful, verify your new email!"
+                message = "Email change request sent!"
             });
         }
 
@@ -152,6 +152,43 @@ namespace StudyAuthApp.WebApi.Controllers
             return Ok(new
             {
                 message = "Email change successful, verify your new email!"
+            });
+        }
+
+        [HttpPost("change-password-request")]
+        public async Task<IActionResult> ChangePasswordRequest(ChangePasswordRequestDto passwordDto)
+        {
+            if (passwordDto == null)
+                return NotFound("No password to change!");
+
+            var isPasswordChangeSent = await _authRepo.ChangePasswordRequest(passwordDto, Request.Headers["origin"]);
+
+            if (!isPasswordChangeSent)
+                return NotFound("Change password wasn't sent!"); ;
+
+            return Ok(new
+            {
+                message = "Password change request sent!"
+            });
+        }
+
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword(ChangePasswordDto passwordDto)
+        {
+            if (passwordDto.OldPassword == passwordDto.NewPassword)
+                return Unauthorized("New password is the same as an old one!");
+
+            if (passwordDto.NewPassword != passwordDto.ConfirmNewPassword)
+                return Unauthorized("Passwords do not match!");
+
+            var isPasswordChanged = await _authRepo.ChangePassword(passwordDto, Request.Headers["origin"]);
+
+            if (!isPasswordChanged)
+                return NotFound("Password wasn't changed!"); ;
+
+            return Ok(new
+            {
+                message = "Password change successful!"
             });
         }
     }

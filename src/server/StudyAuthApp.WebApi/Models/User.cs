@@ -31,5 +31,11 @@ namespace StudyAuthApp.WebApi.Models
         public DateTime EmailChangeTokenExpiresAt { get; set; }
 
         public string EmailChangeToken { get; set; }
+
+        public DateTime PasswordChangedAt { get; set; }
+
+        public DateTime PasswordChangeTokenExpiresAt { get; set; }
+
+        public string PasswordChangeToken { get; set; }
     }
 }

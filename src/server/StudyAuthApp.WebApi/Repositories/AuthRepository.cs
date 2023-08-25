@@ -53,6 +53,8 @@ namespace StudyAuthApp.WebApi.Repositories
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
 
+            //TODO: login if email is verified
+
             if (user == null)
                 return null;
 
@@ -278,6 +280,50 @@ namespace StudyAuthApp.WebApi.Repositories
 
         #endregion
 
+        #region Change password
+
+        public async Task<bool> ChangePasswordRequest(ChangePasswordRequestDto passwordDto, string origin)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == passwordDto.Email)
+                ?? throw new AppException("No user found to change email!");
+
+            user.PasswordChangeToken = GenerateVerificationToken();
+            user.PasswordChangeTokenExpiresAt = DateTime.UtcNow.AddMinutes(30);
+
+            _context.Users.Update(user);
+            var savedChanges = await _context.SaveChangesAsync();
+
+            await SendChangePassword(user, origin);
+
+            return savedChanges > 0;
+        }
+
+        public async Task<bool> ChangePassword(ChangePasswordDto passwordDto, string origin)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.PasswordChangeToken == passwordDto.Token)
+                ?? throw new AppException("No user for verification!");
+
+            if (user.PasswordChangeTokenExpiresAt < DateTime.UtcNow)
+                return false;
+
+            if (!VerifyPasswordHash(passwordDto.OldPassword, user.Password))
+                return false;
+
+            user.Password = CreatePasswordHash(passwordDto.NewPassword);
+
+            user.PasswordChangeToken = null;
+            user.PasswordChangeTokenExpiresAt = default;
+            user.PasswordChangedAt = DateTime.UtcNow;
+
+            _context.Users.Update(user);
+
+            var savedChanges = await _context.SaveChangesAsync();
+
+            return savedChanges > 0;
+        }
+
+        #endregion
+
         #region Generate tokens private helpers
 
         private string GenerateResetToken()
@@ -348,6 +394,29 @@ namespace StudyAuthApp.WebApi.Repositories
                 to: user.Email,
                 subject: "Email change",
                 html: $@"<h4>Change Email</h4>
+                        {message}"
+            );
+        }
+
+        private async Task SendChangePassword(User user, string origin)
+        {
+            string message;
+            if (!string.IsNullOrEmpty(origin))
+            {
+                var verifyUrl = $"{origin}/profile/change-password?token={user.PasswordChangeToken}";
+                message = $@"<p>Please click the below link to change your password:</p>
+                            <p><a href=""{verifyUrl}"">change your email</a></p>";
+            }
+            else
+            {
+                message = $@"<p>Please use the below token to change your password</p>
+                            <p><code>{user.PasswordChangeToken}</code></p>";
+            }
+
+            await _emailService.Send(
+                to: user.Email,
+                subject: "Password change",
+                html: $@"<h4>Change Password</h4>
                         {message}"
             );
         }

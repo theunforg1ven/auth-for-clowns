@@ -32,5 +32,9 @@ namespace StudyAuthApp.WebApi.Interfaces
         Task<bool> ChangeEmailRequest(ChangeEmailRequestDto emailDto, string origin);
 
         Task<bool> ChangeEmail(ChangeEmailDto emailDto, string origin);
+
+        Task<bool> ChangePasswordRequest(ChangePasswordRequestDto passwordDto, string origin);
+
+        Task<bool> ChangePassword(ChangePasswordDto passwordDto, string origin);
     }
 }
