@@ -14,6 +14,7 @@ import {
   NbIconModule,
   NbInputModule,
   NbLayoutModule,
+  NbToastrModule,
   NbUserModule,
 } from '@nebular/theme';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
@@ -29,6 +30,7 @@ import { NbEvaIconsModule } from '@nebular/eva-icons';
     NbInputModule,
     NbButtonModule,
     NbUserModule,
+    NbToastrModule.forRoot(),
   ],
   declarations: [
     LayoutComponent,

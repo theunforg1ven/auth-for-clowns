@@ -49,16 +49,28 @@ namespace StudyAuthApp.WebApi.Repositories
             return user;
         }
 
-        public async Task<User> Login(string email, string password)
+        public async Task<User> Login(string email, string password, string origin)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
-
-            //TODO: login if email is verified
 
             if (user == null)
                 return null;
 
-           if (!VerifyPasswordHash(password, user.Password))
+            if (!user.IsEmailVerified)
+            {
+                user.EmailVerificationToken = GenerateVerificationToken();
+                user.EmailTokenExpiresAt = DateTime.UtcNow.AddMinutes(30);
+
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+
+                await SendVerificationEmail(user, origin);
+               
+                return user;
+            }
+                
+
+            if (!VerifyPasswordHash(password, user.Password))
               return null;
 
             return user;
@@ -249,7 +261,7 @@ namespace StudyAuthApp.WebApi.Repositories
 
         public async Task<bool> ChangeEmail(ChangeEmailDto emailDto, string origin)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == emailDto.CurrentEmail)
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == emailDto.CurrentEmail && u.EmailChangeToken == emailDto.Token)
                 ?? throw new AppException("No user for verification!");
 
             if (user.EmailChangeTokenExpiresAt < DateTime.UtcNow)

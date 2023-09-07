@@ -69,10 +69,13 @@ namespace StudyAuthApp.WebApi.Controllers
             if (!authorizationHeader.IsNullOrEmpty())
                 return RedirectToAction("GetCurrentUser", "Auth");
 
-            var userFromRepo = await _authRepo.Login(loginDto.Email, loginDto.Password);
+            var userFromRepo = await _authRepo.Login(loginDto.Email, loginDto.Password, Request.Headers["origin"]);
 
             if (userFromRepo == null)
                 return Unauthorized("Invalid email or password!");
+
+            if(!userFromRepo.IsEmailVerified)
+                return Unauthorized("Email is not verified, check your email for verification link!");
 
             var accessToken = _tokenService.CreateAccessToken(userFromRepo.Id);
             var refreshToken = _tokenService.CreateRefreshToken(userFromRepo.Id);

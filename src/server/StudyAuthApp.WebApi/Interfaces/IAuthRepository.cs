@@ -7,7 +7,7 @@ namespace StudyAuthApp.WebApi.Interfaces
     {
         Task<User> Register(User user, string password, string origin);
 
-        Task<User> Login(string username, string password);
+        Task<User> Login(string username, string password, string origin);
 
         Task<bool> AddUserRefreshToken(UserToken token);
 

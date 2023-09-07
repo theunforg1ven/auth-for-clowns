@@ -18,11 +18,15 @@ export class ErrorInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<any>> {
     return next.handle(request).pipe(
       catchError((err) => {
-        if ([401, 403].includes(err.status) && this.authService.accountValue) {
+        if (
+          [401, 403].includes(JSON.parse(err.status)) &&
+          this.authService.accountValue
+        ) {
           this.authService.logout();
         }
         const error = (err && err.error && err.error.message) || err.statusText;
         console.error(err);
+        console.error(err.error);
         return throwError(() => error);
       })
     );

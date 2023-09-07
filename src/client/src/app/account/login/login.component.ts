@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { first } from 'rxjs';
 import { AuthService } from 'src/app/_services/auth.service';
 import FormValidator from 'src/app/_helpers/formValidator';
+import { NbToastrService } from '@nebular/theme';
 
 @Component({
   selector: 'app-login',
@@ -20,7 +21,8 @@ export class LoginComponent implements OnInit {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private toastrService: NbToastrService
   ) {}
 
   get f() {
@@ -49,6 +51,7 @@ export class LoginComponent implements OnInit {
           this.router.navigateByUrl(returnUrl);
         },
         error: (error) => {
+          this.toastrService.warning('Error of logging in', `${error.error}`);
           console.error(error);
           this.submitting = false;
         },
