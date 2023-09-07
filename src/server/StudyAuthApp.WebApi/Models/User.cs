@@ -37,5 +37,9 @@ namespace StudyAuthApp.WebApi.Models
         public DateTime PasswordChangeTokenExpiresAt { get; set; }
 
         public string PasswordChangeToken { get; set; }
+
+        public ICollection<ResetToken> ResetTokens { get; set; }
+
+        public ICollection<UserToken> UserTokens { get; set; }
     }
 }
